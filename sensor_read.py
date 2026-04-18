@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyOpKL7n1bowdVjCFUcJ0K1g",
+      "authorship_tag": "ABX9TyOlS8x8luqjMii0xNtix29A",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -67,6 +67,38 @@
       ],
       "metadata": {
         "id": "yyNU2SuCDhl_"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def estimate_co2_ppm(raw_adc):\n",
+        "    \"\"\"Estimate CO2 concentration in ppm from MQ-135 sensitivity curve.\"\"\"\n",
+        "    rs    = get_resistance(raw_adc)\n",
+        "    ratio = rs / MQ135_RO\n",
+        "    ppm   = 116.6020682 * math.pow(ratio, -2.769034857)\n",
+        "    return round(max(400.0, ppm), 1)   # indoor CO2 baseline ~400 ppm"
+      ],
+      "metadata": {
+        "id": "cEFQEsBnEsca"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def estimate_co_ppm(raw_adc):\n",
+        "    \"\"\"Estimate CO (carbon monoxide) concentration in ppm.\"\"\"\n",
+        "    rs    = get_resistance(raw_adc)\n",
+        "    ratio = rs / MQ135_RO\n",
+        "    ppm   = 605.18 * math.pow(ratio, -3.937)\n",
+        "    return round(max(0.0, ppm), 1)\n"
+      ],
+      "metadata": {
+        "id": "CBEQ34z4E3Ov"
       },
       "execution_count": null,
       "outputs": []
