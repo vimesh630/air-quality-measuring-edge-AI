@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyOQn+uJVP7Dcu+ZxE7cG7mj",
+      "authorship_tag": "ABX9TyPZfhRy/ZIf6939As+pqFms",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -38,6 +38,28 @@
         "import math\n",
         "import time\n"
       ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "_t = 0  # internal time counter for smooth realistic drift\n",
+        "MQ135_RL = 10.0    # load resistance in kΩ\n",
+        "MQ135_RO = 76.63   # sensor resistance in clean air (baseline)"
+      ],
+      "metadata": {
+        "id": "JtlEMBEeDcdq"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "yyNU2SuCDhl_"
+      },
+      "execution_count": null,
+      "outputs": []
     }
   ]
 }
