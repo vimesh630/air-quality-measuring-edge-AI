@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyMqK6wJ2o1Fr0Jyd3WbU7fN",
+      "authorship_tag": "ABX9TyNvFQjxATXM3nFI8l/W3RkG",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -115,6 +115,50 @@
       ],
       "metadata": {
         "id": "Tbs4C2rRFAMY"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Main sensor reading function\n",
+        "\n",
+        "def read_sensors():\n",
+        "    \"\"\"\n",
+        "    Simulates DHT22 + MQ-135 sensor readings including individual\n",
+        "    gas concentration estimates.\n",
+        "    Returns a dict matching exactly what the real hardware version returns.\n",
+        "    On Day 5 this entire file gets replaced with the real sensor version.\n",
+        "    \"\"\"\n",
+        "    global _t\n",
+        "    _t += 1\n",
+        "\n",
+        "     # Temperature drifts smoothly between 22–30°C\n",
+        "    temperature = round(\n",
+        "        26 + 4 * math.sin(_t / 30) + random.uniform(-0.3, 0.3), 1\n",
+        "    )\n",
+        "\n",
+        "    # Humidity drifts inversely to temperature (45–75%)\n",
+        "    humidity = round(\n",
+        "        60 - 6 * math.sin(_t / 30) + random.uniform(-0.5, 0.5), 1\n",
+        "    )\n",
+        "    humidity = max(0.0, min(100.0, humidity))\n",
+        "\n",
+        "    # AQI — mostly normal with occasional spikes to simulate\n",
+        "    # cooking smoke, cleaning products etc.\n",
+        "    spike = random.random() < 0.08   # 8% chance of spike\n",
+        "    if spike:\n",
+        "        aqi = round(random.uniform(60, 95), 1)\n",
+        "    else:\n",
+        "        aqi = round(\n",
+        "            28 + 12 * math.sin(_t / 50) + random.uniform(-2, 2), 1\n",
+        "        )\n",
+        "    aqi = max(0.0, min(100.0, aqi))\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "HuCg1U5GF47K"
       },
       "execution_count": null,
       "outputs": []
