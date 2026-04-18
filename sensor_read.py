@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyPZfhRy/ZIf6939As+pqFms",
+      "authorship_tag": "ABX9TyOpKL7n1bowdVjCFUcJ0K1g",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -54,7 +54,17 @@
     },
     {
       "cell_type": "code",
-      "source": [],
+      "source": [
+        "def get_resistance(raw_adc):\n",
+        "    \"\"\"Convert raw ADC reading (0–1023) to sensor resistance Rs in kΩ.\"\"\"\n",
+        "    if raw_adc <= 0:\n",
+        "        raw_adc = 1\n",
+        "    voltage = (raw_adc / 1023.0) * 5.0\n",
+        "    if voltage <= 0:\n",
+        "        voltage = 0.001\n",
+        "    rs = ((5.0 * MQ135_RL) / voltage) - MQ135_RL\n",
+        "    return max(rs, 0.001)"
+      ],
       "metadata": {
         "id": "yyNU2SuCDhl_"
       },
