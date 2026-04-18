@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyNvFQjxATXM3nFI8l/W3RkG",
+      "authorship_tag": "ABX9TyMrxzXtQBXaUt4FyYhcAYIc",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -155,6 +155,24 @@
         "            28 + 12 * math.sin(_t / 50) + random.uniform(-2, 2), 1\n",
         "        )\n",
         "    aqi = max(0.0, min(100.0, aqi))\n",
+        "\n",
+        "    # Convert AQI percentage back to a raw ADC value for gas calculations\n",
+        "    raw_aqi = int(aqi * 10.23)\n",
+        "\n",
+        "    # Estimate individual gas concentrations from raw ADC reading\n",
+        "    co2_ppm = estimate_co2_ppm(raw_aqi)\n",
+        "    co_ppm  = estimate_co_ppm(raw_aqi)\n",
+        "    nh3_ppm = estimate_nh3_ppm(raw_aqi)\n",
+        "\n",
+        "    return {\n",
+        "        \"temperature\": temperature,\n",
+        "        \"humidity\":    humidity,\n",
+        "        \"aqi\":         aqi,\n",
+        "        \"raw_aqi\":     raw_aqi,\n",
+        "        \"co2_ppm\":     co2_ppm,\n",
+        "        \"co_ppm\":      co_ppm,\n",
+        "        \"nh3_ppm\":     nh3_ppm\n",
+        "    }\n",
         "\n"
       ],
       "metadata": {
