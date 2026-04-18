@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyOlS8x8luqjMii0xNtix29A",
+      "authorship_tag": "ABX9TyMqK6wJ2o1Fr0Jyd3WbU7fN",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -99,6 +99,22 @@
       ],
       "metadata": {
         "id": "CBEQ34z4E3Ov"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def estimate_nh3_ppm(raw_adc):\n",
+        "    \"\"\"Estimate NH3 (ammonia) concentration in ppm.\"\"\"\n",
+        "    rs    = get_resistance(raw_adc)\n",
+        "    ratio = rs / MQ135_RO\n",
+        "    ppm   = 102.2 * math.pow(ratio, -2.473)\n",
+        "    return round(max(0.0, ppm), 1)\n"
+      ],
+      "metadata": {
+        "id": "Tbs4C2rRFAMY"
       },
       "execution_count": null,
       "outputs": []
