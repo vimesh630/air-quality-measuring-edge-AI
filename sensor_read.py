@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyMrxzXtQBXaUt4FyYhcAYIc",
+      "authorship_tag": "ABX9TyMd9hxCMH3TtUbSwivIgmVh",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -177,6 +177,32 @@
       ],
       "metadata": {
         "id": "HuCg1U5GF47K"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Quick test\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    print(\"Sensor simulator test — 5 readings:\\n\")\n",
+        "    for i in range(5):\n",
+        "        data = read_sensors()\n",
+        "        print(f\"  Reading {i+1}:\")\n",
+        "        print(f\"    Temp      : {data['temperature']}°C\")\n",
+        "        print(f\"    Humidity  : {data['humidity']}%\")\n",
+        "        print(f\"    AQI       : {data['aqi']}\")\n",
+        "        print(f\"    CO2       : {data['co2_ppm']} ppm\")\n",
+        "        print(f\"    CO        : {data['co_ppm']} ppm\")\n",
+        "        print(f\"    NH3       : {data['nh3_ppm']} ppm\")\n",
+        "        print()\n",
+        "        time.sleep(0.5)\n",
+        "    print(\"Simulator working correctly.\")"
+      ],
+      "metadata": {
+        "id": "my8XqDWjGxq3"
       },
       "execution_count": null,
       "outputs": []
