@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyPyU/7F6x2J0LAq/ezOeyEu",
+      "authorship_tag": "ABX9TyMzACjKGMSmq7+RkKa1Qs+K",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -41,6 +41,27 @@
         "import os\n",
         "import glob"
       ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Load all 12 CSV files\n",
+        "data_path = \"model/data/\"\n",
+        "all_files = glob.glob(os.path.join(data_path, \"PRSA_Data_*.csv\"))\n",
+        "\n",
+        "print(f\"Found {len(all_files)} CSV files\\n\")\n",
+        "\n",
+        "df_list = []\n",
+        "for f in all_files:\n",
+        "    df_list.append(pd.read_csv(f))\n",
+        "\n",
+        "df = pd.concat(df_list, ignore_index=True)"
+      ],
+      "metadata": {
+        "id": "MuxjSW7jhGOm"
+      },
+      "execution_count": null,
+      "outputs": []
     }
   ]
 }
