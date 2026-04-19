@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyMzACjKGMSmq7+RkKa1Qs+K",
+      "authorship_tag": "ABX9TyOTuYuK2gV1Q+gExtoeGziR",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -55,10 +55,26 @@
         "for f in all_files:\n",
         "    df_list.append(pd.read_csv(f))\n",
         "\n",
-        "df = pd.concat(df_list, ignore_index=True)"
+        "df = pd.concat(df_list, ignore_index=True)\n",
+        "\n",
+        "print(f\"Total rows loaded : {len(df):,}\")\n",
+        "print(f\"Total columns     : {len(df.columns)}\")\n",
+        "print(f\"\\nColumn names:\")\n",
+        "print(list(df.columns))\n",
+        "print(f\"\\nFirst 3 rows:\")\n",
+        "print(df.head(3))"
       ],
       "metadata": {
         "id": "MuxjSW7jhGOm"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "s9wctqM1q9PC"
       },
       "execution_count": null,
       "outputs": []
