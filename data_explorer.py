@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyOTuYuK2gV1Q+gExtoeGziR",
+      "authorship_tag": "ABX9TyNhcs5Krq4HXpnwONaCBWnZ",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -72,7 +72,20 @@
     },
     {
       "cell_type": "code",
-      "source": [],
+      "source": [
+        "# STEP 2 — Check missing values\n",
+        "\n",
+        "print(\"\\n── Missing values ──────────────────────\")\n",
+        "missing = df.isnull().sum()\n",
+        "missing_pct = (missing / len(df) * 100).round(2)\n",
+        "\n",
+        "missing_report = pd.DataFrame({\n",
+        "    'missing_count': missing,\n",
+        "    'missing_percent': missing_pct\n",
+        "}).sort_values('missing_percent', ascending=False)\n",
+        "\n",
+        "print(missing_report[missing_report['missing_count'] > 0])\n"
+      ],
       "metadata": {
         "id": "s9wctqM1q9PC"
       },
