@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyMTNuNanLs6kXuD4K2SxQgT",
+      "authorship_tag": "ABX9TyPEIk59315ile1A6lNpZ7JX",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -191,7 +191,32 @@
         "axes[0].set_title('Temperature (°C)')\n",
         "axes[0].set_xlabel('Temperature')\n",
         "axes[0].set_ylabel('Count')\n",
-        "axes[0].legend()\n"
+        "axes[0].legend()\n",
+        "\n",
+        "\n",
+        "# Humidity distribution\n",
+        "for label, color in colors.items():\n",
+        "    subset = df_clean[df_clean['label'] == label]\n",
+        "    axes[1].hist(subset['humidity'], alpha=0.6,\n",
+        "                 label=label, bins=40, color=color)\n",
+        "axes[1].set_title('Humidity (%)')\n",
+        "axes[1].set_xlabel('Humidity')\n",
+        "axes[1].legend()\n",
+        "\n",
+        "# AQI distribution (capped at 200 for readability)\n",
+        "for label, color in colors.items():\n",
+        "    subset = df_clean[df_clean['label'] == label]\n",
+        "    subset_capped = subset[subset['aqi'] <= 200]\n",
+        "    axes[2].hist(subset_capped['aqi'], alpha=0.6,\n",
+        "                 label=label, bins=40, color=color)\n",
+        "axes[2].set_title('AQI / PM2.5 (capped at 200)')\n",
+        "axes[2].set_xlabel('AQI')\n",
+        "axes[2].legend()\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "plt.savefig('model/data_distribution.png', dpi=150, bbox_inches='tight')\n",
+        "plt.show()\n",
+        "print(\"\\nPlot saved → model/data_distribution.png\")\n"
       ],
       "metadata": {
         "id": "eJ93JwMWwhEH"
