@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyOTuYuK2gV1Q+gExtoeGziR",
+      "authorship_tag": "ABX9TyM2+kP3EyjEEllGLM854KIT",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -72,9 +72,72 @@
     },
     {
       "cell_type": "code",
-      "source": [],
+      "source": [
+        "# STEP 2 — Check missing values\n",
+        "\n",
+        "print(\"\\n── Missing values ──────────────────────\")\n",
+        "missing = df.isnull().sum()\n",
+        "missing_pct = (missing / len(df) * 100).round(2)\n",
+        "\n",
+        "missing_report = pd.DataFrame({\n",
+        "    'missing_count': missing,\n",
+        "    'missing_percent': missing_pct\n",
+        "}).sort_values('missing_percent', ascending=False)\n",
+        "\n",
+        "print(missing_report[missing_report['missing_count'] > 0])\n"
+      ],
       "metadata": {
         "id": "s9wctqM1q9PC"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# STEP 3 — Select relevant columns and clean\n",
+        "\n",
+        "# Derive relative humidity from temperature and dew point\n",
+        "# using the Magnus formula — standard meteorological method\n",
+        "df['humidity'] = 100 * np.exp(\n",
+        "    (17.625 * df['DEWP']) / (243.04 + df['DEWP'])\n",
+        ") / np.exp(\n",
+        "    (17.625 * df['TEMP']) / (243.04 + df['TEMP'])\n",
+        ")\n",
+        "\n",
+        "# Keep only the three columns that match our sensors\n",
+        "df_clean = df[['TEMP', 'humidity', 'PM2.5']].copy()\n",
+        "df_clean.columns = ['temperature', 'humidity', 'aqi']\n",
+        "\n",
+        "# Drop rows where any value is missing\n",
+        "before = len(df_clean)\n",
+        "df_clean = df_clean.dropna()\n",
+        "after = len(df_clean)\n",
+        "print(f\"\\n── Cleaning ────────────────────────────\")\n",
+        "print(f\"Rows before dropping NaN : {before:,}\")\n",
+        "print(f\"Rows after dropping NaN  : {after:,}\")\n",
+        "print(f\"Rows dropped             : {before - after:,}\")\n",
+        "\n",
+        "\n",
+        "# Remove physically impossible values\n",
+        "df_clean = df_clean[\n",
+        "    (df_clean['temperature'] > -30) &\n",
+        "    (df_clean['temperature'] < 60)  &\n",
+        "    (df_clean['humidity'] >= 0)     &\n",
+        "    (df_clean['humidity'] <= 100)   &\n",
+        "    (df_clean['aqi'] >= 0)\n",
+        "]\n",
+        "\n",
+        "# Clamp humidity to 0–100 just in case of floating point edge cases\n",
+        "df_clean['humidity'] = df_clean['humidity'].clip(0, 100)\n",
+        "\n",
+        "print(f\"Rows after removing impossible values : {len(df_clean):,}\")\n",
+        "print(f\"\\n── Summary statistics ──────────────────\")\n",
+        "print(df_clean.describe().round(2))\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "BlIMBX6dt15Y"
       },
       "execution_count": null,
       "outputs": []
