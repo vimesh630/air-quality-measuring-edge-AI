@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyOlGm0Spzs0Isw6mnEnMyO4",
+      "authorship_tag": "ABX9TyNaldMyfF0WphZDVhUWIdMc",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -154,6 +154,17 @@
         "        return 'moderate'\n",
         "    else:\n",
         "        return 'poor'\n",
+        "\n",
+        "df_clean['label'] = df_clean['aqi'].apply(assign_label)\n",
+        "\n",
+        "print(f\"\\n── Class distribution ──────────────────\")\n",
+        "counts = df_clean['label'].value_counts()\n",
+        "pcts   = df_clean['label'].value_counts(normalize=True).mul(100).round(1)\n",
+        "\n",
+        "for label in ['good', 'moderate', 'poor']:\n",
+        "    print(f\"  {label:<12} {counts[label]:>8,} rows   ({pcts[label]}%)\")\n",
+        "\n",
+        "print(f\"\\n  Total        {len(df_clean):>8,} rows\")\n",
         "\n"
       ],
       "metadata": {
