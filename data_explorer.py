@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyPEIk59315ile1A6lNpZ7JX",
+      "authorship_tag": "ABX9TyNJmUyVXUiJXfnqDfzf1beI",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -220,6 +220,26 @@
       ],
       "metadata": {
         "id": "eJ93JwMWwhEH"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# STEP 6 — Save clean dataset\n",
+        "\n",
+        "output_path = 'model/data/aqm_clean.csv'\n",
+        "df_clean.to_csv(output_path, index=False)\n",
+        "\n",
+        "print(f\"\\n── Saved ───────────────────────────────\")\n",
+        "print(f\"Clean dataset saved to : {output_path}\")\n",
+        "print(f\"Rows                   : {len(df_clean):,}\")\n",
+        "print(f\"Columns                : {list(df_clean.columns)}\")\n",
+        "print(f\"\\nReady for training tomorrow.\")"
+      ],
+      "metadata": {
+        "id": "0H-2DIhSxV9C"
       },
       "execution_count": null,
       "outputs": []
