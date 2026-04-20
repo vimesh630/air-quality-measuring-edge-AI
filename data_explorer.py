@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyM2+kP3EyjEEllGLM854KIT",
+      "authorship_tag": "ABX9TyOlGm0Spzs0Isw6mnEnMyO4",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -138,6 +138,26 @@
       ],
       "metadata": {
         "id": "BlIMBX6dt15Y"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# STEP 4 — Create classification labels\n",
+        "\n",
+        "def assign_label(pm25):\n",
+        "    if pm25 <= 12.0:\n",
+        "        return 'good'\n",
+        "    elif pm25 <= 35.4:\n",
+        "        return 'moderate'\n",
+        "    else:\n",
+        "        return 'poor'\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "Odis9-A_vao3"
       },
       "execution_count": null,
       "outputs": []
