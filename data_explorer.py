@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyM2+kP3EyjEEllGLM854KIT",
+      "authorship_tag": "ABX9TyNaldMyfF0WphZDVhUWIdMc",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -138,6 +138,37 @@
       ],
       "metadata": {
         "id": "BlIMBX6dt15Y"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# STEP 4 — Create classification labels\n",
+        "\n",
+        "def assign_label(pm25):\n",
+        "    if pm25 <= 12.0:\n",
+        "        return 'good'\n",
+        "    elif pm25 <= 35.4:\n",
+        "        return 'moderate'\n",
+        "    else:\n",
+        "        return 'poor'\n",
+        "\n",
+        "df_clean['label'] = df_clean['aqi'].apply(assign_label)\n",
+        "\n",
+        "print(f\"\\n── Class distribution ──────────────────\")\n",
+        "counts = df_clean['label'].value_counts()\n",
+        "pcts   = df_clean['label'].value_counts(normalize=True).mul(100).round(1)\n",
+        "\n",
+        "for label in ['good', 'moderate', 'poor']:\n",
+        "    print(f\"  {label:<12} {counts[label]:>8,} rows   ({pcts[label]}%)\")\n",
+        "\n",
+        "print(f\"\\n  Total        {len(df_clean):>8,} rows\")\n",
+        "\n"
+      ],
+      "metadata": {
+        "id": "Odis9-A_vao3"
       },
       "execution_count": null,
       "outputs": []
