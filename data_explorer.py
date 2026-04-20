@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyNaldMyfF0WphZDVhUWIdMc",
+      "authorship_tag": "ABX9TyMTNuNanLs6kXuD4K2SxQgT",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -169,6 +169,32 @@
       ],
       "metadata": {
         "id": "Odis9-A_vao3"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# STEP 5 — Visualise data distributions\n",
+        "\n",
+        "fig, axes = plt.subplots(1, 3, figsize=(15, 5))\n",
+        "fig.suptitle('Feature distributions by air quality label', fontsize=14)\n",
+        "\n",
+        "colors = {'good': '#1D9E75', 'moderate': '#BA7517', 'poor': '#E24B4A'}\n",
+        "\n",
+        "# Temperature distribution\n",
+        "for label, color in colors.items():\n",
+        "    subset = df_clean[df_clean['label'] == label]\n",
+        "    axes[0].hist(subset['temperature'], alpha=0.6,\n",
+        "                 label=label, bins=40, color=color)\n",
+        "axes[0].set_title('Temperature (°C)')\n",
+        "axes[0].set_xlabel('Temperature')\n",
+        "axes[0].set_ylabel('Count')\n",
+        "axes[0].legend()\n"
+      ],
+      "metadata": {
+        "id": "eJ93JwMWwhEH"
       },
       "execution_count": null,
       "outputs": []
