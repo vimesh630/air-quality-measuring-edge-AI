@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyNaldMyfF0WphZDVhUWIdMc",
+      "authorship_tag": "ABX9TyNJmUyVXUiJXfnqDfzf1beI",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -169,6 +169,77 @@
       ],
       "metadata": {
         "id": "Odis9-A_vao3"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# STEP 5 — Visualise data distributions\n",
+        "\n",
+        "fig, axes = plt.subplots(1, 3, figsize=(15, 5))\n",
+        "fig.suptitle('Feature distributions by air quality label', fontsize=14)\n",
+        "\n",
+        "colors = {'good': '#1D9E75', 'moderate': '#BA7517', 'poor': '#E24B4A'}\n",
+        "\n",
+        "# Temperature distribution\n",
+        "for label, color in colors.items():\n",
+        "    subset = df_clean[df_clean['label'] == label]\n",
+        "    axes[0].hist(subset['temperature'], alpha=0.6,\n",
+        "                 label=label, bins=40, color=color)\n",
+        "axes[0].set_title('Temperature (°C)')\n",
+        "axes[0].set_xlabel('Temperature')\n",
+        "axes[0].set_ylabel('Count')\n",
+        "axes[0].legend()\n",
+        "\n",
+        "\n",
+        "# Humidity distribution\n",
+        "for label, color in colors.items():\n",
+        "    subset = df_clean[df_clean['label'] == label]\n",
+        "    axes[1].hist(subset['humidity'], alpha=0.6,\n",
+        "                 label=label, bins=40, color=color)\n",
+        "axes[1].set_title('Humidity (%)')\n",
+        "axes[1].set_xlabel('Humidity')\n",
+        "axes[1].legend()\n",
+        "\n",
+        "# AQI distribution (capped at 200 for readability)\n",
+        "for label, color in colors.items():\n",
+        "    subset = df_clean[df_clean['label'] == label]\n",
+        "    subset_capped = subset[subset['aqi'] <= 200]\n",
+        "    axes[2].hist(subset_capped['aqi'], alpha=0.6,\n",
+        "                 label=label, bins=40, color=color)\n",
+        "axes[2].set_title('AQI / PM2.5 (capped at 200)')\n",
+        "axes[2].set_xlabel('AQI')\n",
+        "axes[2].legend()\n",
+        "\n",
+        "plt.tight_layout()\n",
+        "plt.savefig('model/data_distribution.png', dpi=150, bbox_inches='tight')\n",
+        "plt.show()\n",
+        "print(\"\\nPlot saved → model/data_distribution.png\")\n"
+      ],
+      "metadata": {
+        "id": "eJ93JwMWwhEH"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# STEP 6 — Save clean dataset\n",
+        "\n",
+        "output_path = 'model/data/aqm_clean.csv'\n",
+        "df_clean.to_csv(output_path, index=False)\n",
+        "\n",
+        "print(f\"\\n── Saved ───────────────────────────────\")\n",
+        "print(f\"Clean dataset saved to : {output_path}\")\n",
+        "print(f\"Rows                   : {len(df_clean):,}\")\n",
+        "print(f\"Columns                : {list(df_clean.columns)}\")\n",
+        "print(f\"\\nReady for training tomorrow.\")"
+      ],
+      "metadata": {
+        "id": "0H-2DIhSxV9C"
       },
       "execution_count": null,
       "outputs": []
