@@ -228,3 +228,9 @@ Key packages (see `requirements.txt` for the full list):
 - PM2.5 mapped to 0–100 AQI scale to be compatible with the live sensor output
 
 ---
+
+## 📄 License
+
+This project is for academic and research purposes.
+
+---
