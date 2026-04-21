@@ -108,3 +108,12 @@ AQI/
 > **Analog noise mitigation**: `sensor_read.py` takes 10 oversampled readings per cycle and averages them to eliminate mains hum (50 Hz) and signal jitter.
 
 ---
+
+## ☁️ Cloud Architecture
+
+- **AWS IoT Core** — MQTT broker with mutual TLS authentication (X.509 certificates)
+- **DynamoDB** — `aqm_readings` table keyed by `device_id` + `timestamp`
+- **IoT Rule** — routes MQTT topic `aqm/data` → DynamoDB insert automatically
+- **Bidirectional MQTT** — dashboard sends commands to `aqm/commands` topic; Pi subscribes and responds
+
+---
