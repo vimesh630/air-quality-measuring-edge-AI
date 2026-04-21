@@ -24,3 +24,18 @@
 ```
 
 ---
+
+## ✨ Key Features
+
+| Feature | Detail |
+|---|---|
+| 🔴 **Real-time Inference** | TFLite neural network runs on Raspberry Pi every 2 s |
+| 🌡️ **Multi-sensor Fusion** | DHT22 (temp + humidity) + MQ-135 (CO₂, CO, NH₃) via ADS1115 ADC |
+| 📊 **AQI Calculation** | Custom weighted formula across CO₂, CO, NH₃ → 0–100 scale |
+| ☁️ **Cloud Streaming** | Secure MQTT over TLS to AWS IoT Core → DynamoDB |
+| 🧠 **LSTM Forecasting** | Stacked LSTM predicts AQI 1 hour ahead (trained on PRSA Beijing dataset) |
+| 📟 **Live React Dashboard** | Real-time charts, status cards, AQI gauge, gas breakdown, alerts |
+| ⚡ **Remote Commands** | Dashboard can trigger manual reads or change sampling interval via MQTT |
+| 🔔 **Alert System** | Automatic "poor" air quality alerts with visual and console warnings |
+
+---
