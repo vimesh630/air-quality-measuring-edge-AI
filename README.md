@@ -95,3 +95,16 @@ AQI/
 - **Export**: `.keras` model + quantized TFLite with SELECT_TF_OPS for stacked LSTM support
 
 ---
+
+## 🔧 Hardware
+
+| Component | Role |
+|---|---|
+| Raspberry Pi 4 | Edge compute, runs TFLite inference loop |
+| DHT22 | Temperature + relative humidity (GPIO pin 4) |
+| MQ-135 | Gas sensor: CO₂, CO, NH₃ estimation |
+| ADS1115 | 16-bit I²C ADC — digitises MQ-135 analog output |
+
+> **Analog noise mitigation**: `sensor_read.py` takes 10 oversampled readings per cycle and averages them to eliminate mains hum (50 Hz) and signal jitter.
+
+---
