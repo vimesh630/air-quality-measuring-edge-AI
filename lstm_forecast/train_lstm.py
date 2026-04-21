@@ -106,3 +106,60 @@ history = model.fit(
     validation_split=0.1,
     verbose=1
 )
+
+# Evaluation & Plots
+print("\nGenerating Plots & Calculating Metrics...")
+plt.figure(figsize=(10, 4))
+plt.plot(history.history['loss'], label='Train Loss (MSE)')
+plt.plot(history.history['val_loss'], label='Val Loss (MSE)')
+plt.title('LSTM Training Loss')
+plt.xlabel('Epochs')
+plt.ylabel('Mean Squared Error')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('output/lstm_loss.png', dpi=150)
+
+# Predict on the entire test set using the new batch size
+preds_full = model.predict(X_test, batch_size=128)
+
+# Inverse transform predictions and truth to get actual PM2.5 units
+dummy_pred = np.zeros((len(preds_full), 3))
+dummy_pred[:, 2] = preds_full.flatten()
+preds_unscaled = scaler.inverse_transform(dummy_pred)[:, 2]
+
+dummy_truth = np.zeros((len(y_test), 3))
+dummy_truth[:, 2] = y_test.flatten()
+truth_unscaled = scaler.inverse_transform(dummy_truth)[:, 2]
+
+# Calculate Metrics
+mse = mean_squared_error(truth_unscaled, preds_unscaled)
+rmse = np.sqrt(mse)
+mae = mean_absolute_error(truth_unscaled, preds_unscaled)
+r2 = r2_score(truth_unscaled, preds_unscaled)
+corr_matrix = np.corrcoef(truth_unscaled, preds_unscaled)
+correlation = corr_matrix[0, 1]
+
+# THIS IS THE PRINT BLOCK THAT WAS MISSING
+print("\n" + "="*50)
+print("TEST SET PERFORMANCE METRICS (Unscaled PM2.5)")
+print("="*50)
+print(f"RMSE (Root Mean Squared Error): {rmse:.2f}")
+print(f"MAE  (Mean Absolute Error):     {mae:.2f}")
+print(f"MSE  (Mean Squared Error):      {mse:.2f}")
+print(f"R² Score:                       {r2:.4f}")
+print(f"Pearson Correlation (r):        {correlation:.4f}")
+print("="*50 + "\n")
+
+# Line Plot: True vs Predict on small unseen subset
+test_subset_len = 300
+plt.figure(figsize=(12, 5))
+plt.plot(truth_unscaled[:test_subset_len], label='Actual PM2.5', color='#1D9E75')
+plt.plot(preds_unscaled[:test_subset_len], label='LSTM 1-Hour Forecast', color='#BA7517', linestyle='--')
+plt.title(f'Prediction Accuracy: Next-Hour PM2.5 Forecast (Sample of {test_subset_len} hours)')
+plt.xlabel('Hours from test start')
+plt.ylabel('PM2.5 Concentration')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('output/lstm_forecast_accuracy.png', dpi=150)
