@@ -234,3 +234,5 @@ Key packages (see `requirements.txt` for the full list):
 This project is for academic and research purposes.
 
 ---
+
+*Built with Python · TensorFlow Lite · AWS IoT Core · React · Flask*
