@@ -7,14 +7,14 @@
 ## 📸 System Overview
 
 ```
-┌─────────────────────────────┐        MQTT / TLS        ┌──────────────────────┐
+┌─────────────────────────────┐        MQTT / TLS         ┌──────────────────────┐
 │        Raspberry Pi          │  ──────────────────────► │    AWS IoT Core      │
 │                             │                           └──────────┬───────────┘
 │  DHT22  ──► Temperature     │                                      │ IoT Rule
 │  MQ-135 ──► CO₂ / CO / NH₃  │                           ┌──────────▼───────────┐
 │             AQI (0–100)     │                           │    DynamoDB Table    │
-│                             │  ◄────────────────────── │   (aqm_readings)     │
-│  TFLite Classifier          │       Commands           └──────────┬───────────┘
+│                             │  ◄──────────────────────  │   (aqm_readings)     │
+│  TFLite Classifier          │       Commands            └──────────┬───────────┘
 │  good / moderate / poor     │                                      │
 └─────────────────────────────┘                           ┌──────────▼───────────┐
                                                           │  Flask API + React   │
