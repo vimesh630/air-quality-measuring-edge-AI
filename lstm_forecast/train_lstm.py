@@ -163,3 +163,37 @@ plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.savefig('output/lstm_forecast_accuracy.png', dpi=150)
+
+# Save Artifacts
+print("Saving Models...")
+model.save('output/lstm_model.keras') # Saved as .keras to prevent warnings
+with open('output/lstm_scaler.pkl', 'wb') as f:
+    pickle.dump(scaler, f)
+    
+print("Exported standard Keras model and scaler.")
+
+# Attempt TFLite conversion
+try:
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    
+    # 1. Add Dynamic Range Quantization (reduces size by ~4x)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    
+    # 2. Target only native TFLite kernels (avoids Flex Ops)
+    converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
+    
+    # 3. Enhanced optimization for internal recurrent structures
+    converter._experimental_lower_tensor_list_ops = True
+    
+    tflite_model = converter.convert()
+    with open('output/aqm_lstm.tflite', 'wb') as f:
+        f.write(tflite_model)
+    print("Exported QUANTIZED, NATIVE TFLite model for high-efficiency Edge Inference.")
+except Exception as e:
+    print(f"\n[Warning] TFLite conversion skipped: {str(e)}")
+    print("The primary .keras model is perfectly fine for predictions.")
+
+print("\n" + "="*50)
+print("SUCCESS: Full LSTM Pipeline Execution Complete.")
+print("Outputs located in c:/Vimesh/AQI/model/lstm_forecast/output/")
+print("="*50)
