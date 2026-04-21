@@ -117,3 +117,87 @@ AQI/
 - **Bidirectional MQTT** — dashboard sends commands to `aqm/commands` topic; Pi subscribes and responds
 
 ---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+```bash
+pip install -r requirements.txt
+```
+
+### 1. Configure Environment
+
+Create a `.env` file in the project root:
+
+```env
+AWS_REGION=eu-north-1
+DYNAMODB_TABLE=aqm_readings
+CLIENT_ID=aqm-pi-device
+AWS_IOT_ENDPOINT=<your-endpoint>.iot.eu-north-1.amazonaws.com
+AWS_IOT_PORT=8883
+AWS_IOT_DATA_TOPIC=aqm/data
+AWS_IOT_CMD_TOPIC=aqm/commands
+CERT_PATH=certs/device.pem.crt
+KEY_PATH=certs/private.pem.key
+CA_PATH=certs/AmazonRootCA1.pem
+AWS_ACCESS_KEY_ID=<your-key>
+AWS_SECRET_ACCESS_KEY=<your-secret>
+```
+
+### 2. Train the Models
+
+```bash
+# Train the AQI classifier (outputs TFLite + scaler)
+python model/classifier/train_model.py
+
+# Train the LSTM forecaster (outputs .keras + TFLite)
+python model/lstm_forecast/train_lstm.py
+```
+
+### 3. Run Edge Inference (on Raspberry Pi)
+
+```bash
+python edge/inference.py
+```
+
+The edge loop will:
+1. Read sensors every 2 seconds
+2. Run TFLite classification
+3. Publish results to AWS IoT Core via MQTT
+4. Print live readings with colour-coded labels to the console
+
+### 4. Start the Dashboard
+
+```bash
+# Backend
+python dashboard/app.py
+
+# Frontend (in aqm-react/)
+cd aqm-react
+npm install
+npm run dev
+```
+
+Open **http://localhost:5173** (React dev server) or **http://localhost:5000** (Flask with Jinja template).
+
+---
+
+## 📡 API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/latest` | Most recent sensor reading |
+| `GET` | `/api/readings?limit=30` | Last N readings from DynamoDB |
+| `GET` | `/api/stats` | Summary stats (avg AQI, label counts, alert count) |
+| `GET` | `/api/forecast` | 1-hour LSTM AQI prediction |
+| `POST` | `/api/command` | Send a command to the Pi via MQTT |
+
+**Command payload examples:**
+```json
+{ "action": "read_now" }
+{ "action": "set_interval", "value": 5 }
+{ "action": "retrain" }
+```
+
+---
