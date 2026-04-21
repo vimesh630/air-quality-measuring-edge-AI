@@ -96,3 +96,13 @@ X_test, y_test = X_all[split_idx:], y_all[split_idx:]
 
 print(f"X_train shape: {X_train.shape}")
 print(f"X_test shape: {X_test.shape}")
+
+# Train Model
+print("\nTraining LSTM Network...")
+history = model.fit(
+    X_train, y_train,
+    epochs=10,           # Updated to 10
+    batch_size=128,      # Updated to 128 (Proper LSTM sizing)
+    validation_split=0.1,
+    verbose=1
+)
