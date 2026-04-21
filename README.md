@@ -75,3 +75,23 @@ AQI/
 ```
 
 ---
+
+## 🧠 AI Models
+
+### 1. Air Quality Classifier (Edge, TFLite)
+
+- **Architecture**: 3-layer dense neural network (64 → 32 → 3 units) with BatchNorm + Dropout
+- **Input features**: `temperature`, `humidity`, `aqi`
+- **Output**: `good` / `moderate` / `poor` with per-class confidence scores
+- **Pre-processing**: also trains a Random Forest for comparison and validation
+- **Deployment**: quantized to TFLite (`< 500 KB`) and runs directly on the Pi
+
+### 2. LSTM AQI Forecaster (Cloud)
+
+- **Architecture**: Stacked LSTM (64 → 32 units) with Dropout
+- **Sequence**: 24-hour lookback window → predicts 1 hour ahead
+- **Training data**: PRSA Beijing PM2.5 dataset (13 stations, 2013–2017)
+- **AQI scaling**: PM2.5 µg/m³ ÷ 10 → mapped to live sensor 0–100 AQI range
+- **Export**: `.keras` model + quantized TFLite with SELECT_TF_OPS for stacked LSTM support
+
+---
