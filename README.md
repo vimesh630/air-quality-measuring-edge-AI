@@ -201,3 +201,21 @@ Open **http://localhost:5173** (React dev server) or **http://localhost:5000** (
 ```
 
 ---
+
+## 📦 Dependencies
+
+Key packages (see `requirements.txt` for the full list):
+
+| Package | Purpose |
+|---|---|
+| `tensorflow` | Model training + TFLite inference |
+| `tflite-runtime` | Lightweight TFLite for Raspberry Pi |
+| `scikit-learn` | Data preprocessing, Random Forest, metrics |
+| `adafruit-circuitpython-dht` | DHT22 driver |
+| `adafruit-circuitpython-ads1x15` | ADS1115 ADC driver |
+| `paho-mqtt` | MQTT communication |
+| `boto3` | AWS DynamoDB & IoT Core |
+| `flask` + `flask-cors` | REST API backend |
+| `pandas` + `numpy` | Data processing |
+
+---
