@@ -39,3 +39,39 @@
 | 🔔 **Alert System** | Automatic "poor" air quality alerts with visual and console warnings |
 
 ---
+
+## 🗂️ Project Structure
+
+```
+AQI/
+├── sensor_read.py              # DHT22 + MQ-135 hardware driver
+├── edge/
+│   └── inference.py            # Main edge loop: read → classify → publish
+├── cloud/
+│   └── mqtt_publisher.py       # MQTT client for AWS IoT Core
+├── model/
+│   ├── classifier/
+│   │   ├── train_model.py      # Trains RF + neural net, exports TFLite
+│   │   └── output/
+│   │       ├── aqm_model.tflite
+│   │       ├── scaler.pkl
+│   │       └── label_encoder.pkl
+│   └── lstm_forecast/
+│       ├── train_lstm.py       # Stacked LSTM for AQI time-series forecasting
+│       └── output/
+│           ├── aqm_lstm.tflite
+│           ├── lstm_model.keras
+│           └── lstm_scaler.pkl
+├── dashboard/
+│   └── app.py                  # Flask REST API (readings, stats, forecast, commands)
+├── aqm-react/                  # Vite + React frontend dashboard
+│   └── src/
+│       ├── App.jsx
+│       └── components/
+├── PRSA_Data_20130301-20170228/ # Beijing PM2.5 dataset (LSTM training data)
+├── .env                        # AWS credentials and IoT config (not committed)
+├── requirements.txt
+└── README.md
+```
+
+---
