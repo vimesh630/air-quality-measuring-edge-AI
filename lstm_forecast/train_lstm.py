@@ -10,24 +10,25 @@ import pickle
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 
 print("="*50)
 print("AQI LSTM Time-Series Forecasting Pipeline")
 print("="*50)
 
-# Setup paths relative to this script
+# 1. Setup paths relative to this script
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.abspath(os.path.join(BASE_DIR, '..', '..', 'PRSA_Data_20130301-20170228'))
 out_dir  = os.path.join(BASE_DIR, 'output')
 os.makedirs(out_dir, exist_ok=True)
 
-# Parameters
+# 2. Parameters
 SEQUENCE_LENGTH = 24  # 24 hours lookback
 PREDICT_DISTANCE = 1  # Predict 1 hour ahead
 FEATURES = ['temperature', 'humidity', 'aqi']
 
-# Load & Process dataset
+# 3. Load & Process dataset
 print("Loading CSV files from:", data_dir)
 all_files = glob.glob(os.path.join(data_dir, "*.csv"))
 if not all_files:
@@ -56,7 +57,13 @@ for f in all_files:
     # Extract specific features
     df_feat = df[['TEMP', 'humidity', 'PM2.5']].copy()
     df_feat.columns = FEATURES
-    
+
+    # Normalize PM2.5 (µg/m³) → 0-100 scale to match the live sensor's AQI output.
+    # PM2.5 ÷ 10 maps realistic air quality ranges (0-1000 µg/m³) to 0-100.
+    # e.g. PM2.5=12 → AQI=1.2 (Good), PM2.5=200 → AQI=20 (Moderate) —
+    # both match what the sensor's calculate_aqi() actually produces.
+    df_feat['aqi'] = (df_feat['aqi'] / 10.0).clip(upper=100.0)
+
     # Time-series safe interpolation (prevents breaking sequences unlike dropping NAs)
     df_feat = df_feat.interpolate(method='linear').bfill().ffill()
     all_data.append(df_feat.values)
@@ -75,7 +82,7 @@ for station_data in all_data:
     X, y = [], []
     for i in range(len(scaled) - SEQUENCE_LENGTH - PREDICT_DISTANCE):
         X.append(scaled[i : i + SEQUENCE_LENGTH])
-        # Target: Next hour's PM2.5 (index 2)
+        # Target: Next hour's EPA AQI (index 2)
         y.append(scaled[i + SEQUENCE_LENGTH + PREDICT_DISTANCE - 1, 2]) 
         
     X_list.append(np.array(X, dtype=np.float32))
@@ -97,17 +104,52 @@ X_test, y_test = X_all[split_idx:], y_all[split_idx:]
 print(f"X_train shape: {X_train.shape}")
 print(f"X_test shape: {X_test.shape}")
 
-# Train Model
+# 4. Build Model
+print("\nBuilding LSTM Model...")
+model = Sequential([
+    # Layer 1: 64-unit LSTM with return_sequences for stacking
+    LSTM(64, input_shape=(SEQUENCE_LENGTH, 3), return_sequences=True),
+    Dropout(0.3),
+    # Layer 2: 32-unit LSTM — captures longer-range dependencies
+    LSTM(32),
+    Dropout(0.2),
+    Dense(16, activation='relu'),
+    Dense(1, activation='linear')
+])
+
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+model.summary()
+
+# 5. Train Model
 print("\nTraining LSTM Network...")
-history = model.fit(
-    X_train, y_train,
-    epochs=10,           # Updated to 10
-    batch_size=128,      # Updated to 128 (Proper LSTM sizing)
-    validation_split=0.1,
+
+# EarlyStopping: halt when val_loss stops improving, restore best weights
+early_stop = EarlyStopping(
+    monitor='val_loss',
+    patience=5,
+    restore_best_weights=True,
     verbose=1
 )
 
-# Evaluation & Plots
+# ReduceLROnPlateau: halve learning rate when val_loss plateaus for 3 epochs
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.5,
+    patience=3,
+    min_lr=1e-6,
+    verbose=1
+)
+
+history = model.fit(
+    X_train, y_train,
+    epochs=50,           # EarlyStopping will exit well before this
+    batch_size=256,      # Larger batch = more stable gradients
+    validation_split=0.1,
+    callbacks=[early_stop, reduce_lr],
+    verbose=1
+)
+
+# 6. Evaluation & Plots
 print("\nGenerating Plots & Calculating Metrics...")
 plt.figure(figsize=(10, 4))
 plt.plot(history.history['loss'], label='Train Loss (MSE)')
@@ -118,7 +160,7 @@ plt.ylabel('Mean Squared Error')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('output/lstm_loss.png', dpi=150)
+plt.savefig(os.path.join(out_dir, 'lstm_loss.png'), dpi=150)
 
 # Predict on the entire test set using the new batch size
 preds_full = model.predict(X_test, batch_size=128)
@@ -142,7 +184,7 @@ correlation = corr_matrix[0, 1]
 
 # THIS IS THE PRINT BLOCK THAT WAS MISSING
 print("\n" + "="*50)
-print("TEST SET PERFORMANCE METRICS (Unscaled PM2.5)")
+print("TEST SET PERFORMANCE METRICS (AQI 0-100 scale)")
 print("="*50)
 print(f"RMSE (Root Mean Squared Error): {rmse:.2f}")
 print(f"MAE  (Mean Absolute Error):     {mae:.2f}")
@@ -158,16 +200,16 @@ plt.plot(truth_unscaled[:test_subset_len], label='Actual PM2.5', color='#1D9E75'
 plt.plot(preds_unscaled[:test_subset_len], label='LSTM 1-Hour Forecast', color='#BA7517', linestyle='--')
 plt.title(f'Prediction Accuracy: Next-Hour PM2.5 Forecast (Sample of {test_subset_len} hours)')
 plt.xlabel('Hours from test start')
-plt.ylabel('PM2.5 Concentration')
+plt.ylabel('AQI (0-100 scale)')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('output/lstm_forecast_accuracy.png', dpi=150)
+plt.savefig(os.path.join(out_dir, 'lstm_forecast_accuracy.png'), dpi=150)
 
-# Save Artifacts
+# 7. Save Artifacts
 print("Saving Models...")
-model.save('output/lstm_model.keras') # Saved as .keras to prevent warnings
-with open('output/lstm_scaler.pkl', 'wb') as f:
+model.save(os.path.join(out_dir, 'lstm_model.keras'))
+with open(os.path.join(out_dir, 'lstm_scaler.pkl'), 'wb') as f:
     pickle.dump(scaler, f)
     
 print("Exported standard Keras model and scaler.")
@@ -179,14 +221,18 @@ try:
     # 1. Add Dynamic Range Quantization (reduces size by ~4x)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     
-    # 2. Target only native TFLite kernels (avoids Flex Ops)
-    converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
-    
-    # 3. Enhanced optimization for internal recurrent structures
-    converter._experimental_lower_tensor_list_ops = True
+    # Stacked LSTMs require Select TF ops — TensorListReserve can't be
+    # lowered to native kernels when return_sequences=True is used.
+    converter.target_spec.supported_ops = [
+        tf.lite.OpsSet.TFLITE_BUILTINS,
+        tf.lite.OpsSet.SELECT_TF_OPS    # Required for stacked LSTMs
+    ]
+
+    # Disable tensor list lowering (incompatible with stacked LSTMs)
+    converter._experimental_lower_tensor_list_ops = False
     
     tflite_model = converter.convert()
-    with open('output/aqm_lstm.tflite', 'wb') as f:
+    with open(os.path.join(out_dir, 'aqm_lstm.tflite'), 'wb') as f:
         f.write(tflite_model)
     print("Exported QUANTIZED, NATIVE TFLite model for high-efficiency Edge Inference.")
 except Exception as e:
