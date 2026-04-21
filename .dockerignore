@@ -1,0 +1,9 @@
+__pycache__
+*.pyc
+*.pyo
+.git
+.gitignore
+aqm-react/node_modules
+model/data/
+*.h5
+model/data/PRSA_Data_*.csv
