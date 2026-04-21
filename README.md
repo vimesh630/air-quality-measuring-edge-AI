@@ -219,3 +219,12 @@ Key packages (see `requirements.txt` for the full list):
 | `pandas` + `numpy` | Data processing |
 
 ---
+
+## 📊 Dataset
+
+- **PRSA Beijing Multi-Site Air-Quality Dataset** (2013–2017)
+- 12 monitoring stations across Beijing
+- Features used: `TEMP`, `DEWP` (→ converted to humidity via Magnus formula), `PM2.5`
+- PM2.5 mapped to 0–100 AQI scale to be compatible with the live sensor output
+
+---
