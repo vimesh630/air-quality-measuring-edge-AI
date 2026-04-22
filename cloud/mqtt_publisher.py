@@ -124,3 +124,15 @@ class MQTTPublisher:
         self.connected = False
         if rc != 0:
             print(f"Unexpected MQTT disconnect (rc={rc}) — will reconnect")
+
+    def _on_message(self, client, userdata, msg):
+        """Handle incoming command messages from dashboard."""
+        try:
+            command = json.loads(msg.payload.decode())
+            print(f"\n[COMMAND RECEIVED] {command}")
+
+            if self.command_callback:
+                self.command_callback(command)
+
+        except json.JSONDecodeError:
+            print(f"Invalid command JSON received: {msg.payload}")
