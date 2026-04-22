@@ -15,22 +15,6 @@ try:
 except ImportError:
     raise ImportError("Run: pip install paho-mqtt")
 
-# Load environment variables from .env
-load_dotenv()
-
-# ─────────────────────────────────────────
-# Configuration from .env
-# ─────────────────────────────────────────
-ENDPOINT   = os.getenv("AWS_IOT_ENDPOINT")
-PORT       = int(os.getenv("AWS_IOT_PORT", 8883))
-DATA_TOPIC = os.getenv("AWS_IOT_DATA_TOPIC", "aqm/data")
-CMD_TOPIC  = os.getenv("AWS_IOT_CMD_TOPIC",  "aqm/commands")
-CLIENT_ID  = os.getenv("CLIENT_ID", "aqm-pi-device")
-CERT_PATH  = os.getenv("CERT_PATH")
-KEY_PATH   = os.getenv("KEY_PATH")
-CA_PATH    = os.getenv("CA_PATH")
-
-
 # ─────────────────────────────────────────
 # MQTTPublisher class
 # ─────────────────────────────────────────
@@ -56,7 +40,6 @@ class MQTTPublisher:
         self.client.on_connect    = self._on_connect
         self.client.on_disconnect = self._on_disconnect
         self.client.on_message    = self._on_message
-
 
     def connect(self):
         """Connect to AWS IoT Core."""
@@ -84,7 +67,6 @@ class MQTTPublisher:
 
         print("Connected to AWS IoT Core successfully.\n")
 
-
     def publish(self, payload: dict):
         """
         Publish a reading payload to the data topic.
@@ -106,8 +88,7 @@ class MQTTPublisher:
         else:
             print(f"MQTT publish failed: rc={result.rc}")
             return False
-
-
+    
     def subscribe_commands(self, callback):
         """
         Subscribe to the command topic.
@@ -117,13 +98,11 @@ class MQTTPublisher:
         self.client.subscribe(CMD_TOPIC, qos=1)
         print(f"Subscribed to command topic: {CMD_TOPIC}")
 
-
     def disconnect(self):
         """Cleanly disconnect from AWS IoT Core."""
         self.client.loop_stop()
         self.client.disconnect()
         print("Disconnected from AWS IoT Core.")
-
 
     # ── Private callbacks ──────────────────
 
@@ -141,12 +120,10 @@ class MQTTPublisher:
             }
             print(f"MQTT connect failed: {error_codes.get(rc, f'rc={rc}')}")
 
-
     def _on_disconnect(self, client, userdata, rc):
         self.connected = False
         if rc != 0:
             print(f"Unexpected MQTT disconnect (rc={rc}) — will reconnect")
-
 
     def _on_message(self, client, userdata, msg):
         """Handle incoming command messages from dashboard."""
@@ -159,7 +136,6 @@ class MQTTPublisher:
 
         except json.JSONDecodeError:
             print(f"Invalid command JSON received: {msg.payload}")
-
 
 # ─────────────────────────────────────────
 # Quick connection test

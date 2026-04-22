@@ -3,22 +3,22 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 
 export function useAQMData(refreshInterval = 5000) {
-  const [readings, setReadings] = useState([])
-  const [latest, setLatest] = useState(null)
-  const [stats, setStats] = useState(null)
-  const [forecast, setForecast] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [readings,    setReadings]    = useState([])
+  const [latest,      setLatest]      = useState(null)
+  const [stats,       setStats]       = useState(null)
+  const [forecast,    setForecast]    = useState(null)
+  const [loading,     setLoading]     = useState(true)
   const [lastUpdated, setLastUpdated] = useState(null)
   const prevAlertRef = useRef(false)
 
   const fetchAll = useCallback(async () => {
     try {
       const [rRes, sRes, fRes] = await Promise.allSettled([
-        axios.get('http://51.21.86.143/api/readings?limit=30'),
-        axios.get('http://51.21.86.143/api/stats'),
-        axios.get('http://51.21.86.143/api/forecast')
+        axios.get('/api/readings?limit=30'),
+        axios.get('/api/stats'),
+        axios.get('/api/forecast')
       ])
-
+      
       if (rRes.status === 'fulfilled' && rRes.value.data.success) {
         const data = rRes.value.data.readings
         setReadings([...data].reverse())
@@ -32,7 +32,7 @@ export function useAQMData(refreshInterval = 5000) {
         }
         prevAlertRef.current = newest?.is_alert || false
       }
-
+      
       if (sRes.status === 'fulfilled' && sRes.value.data.success) {
         setStats(sRes.value.data)
       }
