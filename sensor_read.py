@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyOF1tXlur3AdaQjQABngq94",
+      "authorship_tag": "ABX9TyMLLx2TDjsv8cU2OPWl+vE2",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -104,7 +104,20 @@
         "    ppm   = 116.6020682 * math.pow(ratio, -2.769034857)\n",
         "    return round(max(400.0, ppm), 1)\n",
         "\n",
-        "\n"
+        "def estimate_co_ppm(voltage):\n",
+        "    \"\"\"Estimate CO concentration in ppm from MQ-135.\"\"\"\n",
+        "    rs    = get_resistance(voltage)\n",
+        "    ratio = rs / MQ135_RO\n",
+        "    ppm   = 605.18 * math.pow(ratio, -3.937)\n",
+        "    return round(max(0.0, ppm), 1)\n",
+        "\n",
+        "\n",
+        "def estimate_nh3_ppm(voltage):\n",
+        "    \"\"\"Estimate NH3 concentration in ppm from MQ-135.\"\"\"\n",
+        "    rs    = get_resistance(voltage)\n",
+        "    ratio = rs / MQ135_RO\n",
+        "    ppm   = 102.2 * math.pow(ratio, -2.473)\n",
+        "    return round(max(0.0, ppm), 1)\n"
       ],
       "metadata": {
         "id": "0xyXvf0GSR32"
