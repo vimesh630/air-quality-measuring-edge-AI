@@ -66,3 +66,25 @@ class MQTTPublisher:
             )
 
         print("Connected to AWS IoT Core successfully.\n")
+
+    def publish(self, payload: dict):
+        """
+        Publish a reading payload to the data topic.
+        payload must be a dict — it will be JSON serialised.
+        """
+        if not self.connected:
+            print("MQTT not connected — skipping publish")
+            return False
+
+        # Add ISO timestamp if not present
+        if "timestamp" not in payload:
+            payload["timestamp"] = datetime.utcnow().isoformat()
+
+        message = json.dumps(payload)
+        result  = self.client.publish(DATA_TOPIC, message, qos=1)
+
+        if result.rc == mqtt.MQTT_ERR_SUCCESS:
+            return True
+        else:
+            print(f"MQTT publish failed: rc={result.rc}")
+            return False
