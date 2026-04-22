@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyMLLx2TDjsv8cU2OPWl+vE2",
+      "authorship_tag": "ABX9TyOakhawh0OC6hZEN5Qre8dr",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -121,6 +121,24 @@
       ],
       "metadata": {
         "id": "0xyXvf0GSR32"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# AQI calculation from gas readings\n",
+        "def calculate_aqi(co2_ppm, co_ppm, nh3_ppm):\n",
+        "    \"\"\"Calculate a simple AQI score (0-100) from gas readings.\"\"\"\n",
+        "    co2_score = min((co2_ppm - 400) / 16, 100)\n",
+        "    co_score  = min(co_ppm * 2, 100)\n",
+        "    nh3_score = min(nh3_ppm * 5, 100)\n",
+        "    aqi = (co2_score * 0.5) + (co_score * 0.3) + (nh3_score * 0.2)\n",
+        "    return round(max(0.0, min(100.0, aqi)), 1)\n"
+      ],
+      "metadata": {
+        "id": "wxlXGkqMUOn_"
       },
       "execution_count": null,
       "outputs": []
