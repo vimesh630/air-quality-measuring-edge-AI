@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyMHaF8oWUKBiAKnJyt/mUm7",
+      "authorship_tag": "ABX9TyNdO8QEIi/UmGD/J3+gVeIu",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -84,66 +84,21 @@
     {
       "cell_type": "code",
       "source": [
-        "def get_resistance(raw_adc):\n",
-        "    \"\"\"Convert raw ADC reading (0–1023) to sensor resistance Rs in kΩ.\"\"\"\n",
-        "    if raw_adc <= 0:\n",
-        "        raw_adc = 1\n",
-        "    voltage = (raw_adc / 1023.0) * 5.0\n",
+        "# MQ-135 gas estimation functions\n",
+        "\n",
+        "def get_resistance(voltage):\n",
+        "    \"\"\"Convert voltage reading to sensor resistance Rs in kΩ.\"\"\"\n",
         "    if voltage <= 0:\n",
         "        voltage = 0.001\n",
-        "    rs = ((5.0 * MQ135_RL) / voltage) - MQ135_RL\n",
-        "    return max(rs, 0.001)"
+        "    # Scale voltage back to 5V range (voltage divider compensation)\n",
+        "    voltage_5v = voltage * (20 / 10)\n",
+        "    if voltage_5v <= 0:\n",
+        "        voltage_5v = 0.001\n",
+        "    rs = ((5.0 * MQ135_RL) / voltage_5v) - MQ135_RL\n",
+        "    return max(rs, 0.001)\n"
       ],
       "metadata": {
-        "id": "yyNU2SuCDhl_"
-      },
-      "execution_count": null,
-      "outputs": []
-    },
-    {
-      "cell_type": "code",
-      "source": [
-        "def estimate_co2_ppm(raw_adc):\n",
-        "    \"\"\"Estimate CO2 concentration in ppm from MQ-135 sensitivity curve.\"\"\"\n",
-        "    rs    = get_resistance(raw_adc)\n",
-        "    ratio = rs / MQ135_RO\n",
-        "    ppm   = 116.6020682 * math.pow(ratio, -2.769034857)\n",
-        "    return round(max(400.0, ppm), 1)   # indoor CO2 baseline ~400 ppm"
-      ],
-      "metadata": {
-        "id": "cEFQEsBnEsca"
-      },
-      "execution_count": null,
-      "outputs": []
-    },
-    {
-      "cell_type": "code",
-      "source": [
-        "def estimate_co_ppm(raw_adc):\n",
-        "    \"\"\"Estimate CO (carbon monoxide) concentration in ppm.\"\"\"\n",
-        "    rs    = get_resistance(raw_adc)\n",
-        "    ratio = rs / MQ135_RO\n",
-        "    ppm   = 605.18 * math.pow(ratio, -3.937)\n",
-        "    return round(max(0.0, ppm), 1)\n"
-      ],
-      "metadata": {
-        "id": "CBEQ34z4E3Ov"
-      },
-      "execution_count": null,
-      "outputs": []
-    },
-    {
-      "cell_type": "code",
-      "source": [
-        "def estimate_nh3_ppm(raw_adc):\n",
-        "    \"\"\"Estimate NH3 (ammonia) concentration in ppm.\"\"\"\n",
-        "    rs    = get_resistance(raw_adc)\n",
-        "    ratio = rs / MQ135_RO\n",
-        "    ppm   = 102.2 * math.pow(ratio, -2.473)\n",
-        "    return round(max(0.0, ppm), 1)\n"
-      ],
-      "metadata": {
-        "id": "Tbs4C2rRFAMY"
+        "id": "0xyXvf0GSR32"
       },
       "execution_count": null,
       "outputs": []
