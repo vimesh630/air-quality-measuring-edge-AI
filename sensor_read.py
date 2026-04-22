@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyMd9hxCMH3TtUbSwivIgmVh",
+      "authorship_tag": "ABX9TyPD9AlAEWQStlgrwdEY0rdZ",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -34,9 +34,13 @@
       },
       "outputs": [],
       "source": [
-        "import random\n",
+        "import board\n",
+        "import busio\n",
         "import math\n",
-        "import time\n"
+        "import time\n",
+        "import adafruit_dht\n",
+        "from adafruit_ads1x15.ads1115 import ADS1115\n",
+        "from adafruit_ads1x15.analog_in import AnalogIn\n"
       ]
     },
     {
