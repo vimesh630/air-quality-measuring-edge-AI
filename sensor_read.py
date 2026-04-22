@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyPD9AlAEWQStlgrwdEY0rdZ",
+      "authorship_tag": "ABX9TyNOuD4XMZDaFIAPkATKhwfm",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -42,6 +42,21 @@
         "from adafruit_ads1x15.ads1115 import ADS1115\n",
         "from adafruit_ads1x15.analog_in import AnalogIn\n"
       ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Hardware setup\n",
+        "dht  = adafruit_dht.DHT22(board.D4)\n",
+        "i2c  = busio.I2C(board.SCL, board.SDA)\n",
+        "ads  = ADS1115(i2c)\n",
+        "chan = AnalogIn(ads, 0)\n"
+      ],
+      "metadata": {
+        "id": "a9n9Mxl1RJxS"
+      },
+      "execution_count": null,
+      "outputs": []
     },
     {
       "cell_type": "code",
