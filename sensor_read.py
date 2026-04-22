@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyNOuD4XMZDaFIAPkATKhwfm",
+      "authorship_tag": "ABX9TyMHaF8oWUKBiAKnJyt/mUm7",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -61,9 +61,19 @@
     {
       "cell_type": "code",
       "source": [
-        "_t = 0  # internal time counter for smooth realistic drift\n",
+        "# MQ-135 calibration constants\n",
+        "\n",
         "MQ135_RL = 10.0    # load resistance in kΩ\n",
-        "MQ135_RO = 76.63   # sensor resistance in clean air (baseline)"
+        "MQ135_RO = 9.55    # sensor resistance in clean air (baseline)\n",
+        "VREF     = 3.3     # ADS1115 reference voltage\n",
+        "\n",
+        "def get_smoothed_voltage(channel, samples=10, delay=0.01):\n",
+        "    \"\"\"Takes multiple readings and averages them to eliminate analog noise/mains hum.\"\"\"\n",
+        "    total = 0.0\n",
+        "    for _ in range(samples):\n",
+        "        total += channel.voltage\n",
+        "        time.sleep(delay)\n",
+        "    return total / samples\n"
       ],
       "metadata": {
         "id": "JtlEMBEeDcdq"
