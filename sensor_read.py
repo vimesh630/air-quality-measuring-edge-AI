@@ -4,7 +4,7 @@
   "metadata": {
     "colab": {
       "provenance": [],
-      "authorship_tag": "ABX9TyNdO8QEIi/UmGD/J3+gVeIu",
+      "authorship_tag": "ABX9TyOF1tXlur3AdaQjQABngq94",
       "include_colab_link": true
     },
     "kernelspec": {
@@ -95,7 +95,16 @@
         "    if voltage_5v <= 0:\n",
         "        voltage_5v = 0.001\n",
         "    rs = ((5.0 * MQ135_RL) / voltage_5v) - MQ135_RL\n",
-        "    return max(rs, 0.001)\n"
+        "    return max(rs, 0.001)\n",
+        "\n",
+        "def estimate_co2_ppm(voltage):\n",
+        "    \"\"\"Estimate CO2 concentration in ppm from MQ-135.\"\"\"\n",
+        "    rs    = get_resistance(voltage)\n",
+        "    ratio = rs / MQ135_RO\n",
+        "    ppm   = 116.6020682 * math.pow(ratio, -2.769034857)\n",
+        "    return round(max(400.0, ppm), 1)\n",
+        "\n",
+        "\n"
       ],
       "metadata": {
         "id": "0xyXvf0GSR32"
