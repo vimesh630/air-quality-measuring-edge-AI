@@ -136,3 +136,46 @@ class MQTTPublisher:
 
         except json.JSONDecodeError:
             print(f"Invalid command JSON received: {msg.payload}")
+
+# ─────────────────────────────────────────
+# Quick connection test
+# ─────────────────────────────────────────
+if __name__ == "__main__":
+    print("Testing MQTT connection to AWS IoT Core...\n")
+
+    publisher = MQTTPublisher()
+
+    try:
+        publisher.connect()
+
+        # Send 3 test messages
+        for i in range(3):
+            test_payload = {
+                "device_id"  : "aqm-pi-device",
+                "timestamp"  : datetime.utcnow().isoformat(),
+                "temperature": 25.0 + i,
+                "humidity"   : 60.0,
+                "aqi"        : 30.0 + (i * 10),
+                "label"      : ["good", "moderate", "poor"][i],
+                "confidence" : 0.95,
+                "is_alert"   : i == 2,
+                "test"       : True
+            }
+
+            success = publisher.publish(test_payload)
+            status  = "SENT" if success else "FAILED"
+            print(f"  Message {i+1}: {test_payload['label']:<10} "
+                  f"AQI={test_payload['aqi']}  [{status}]")
+            time.sleep(1)
+
+        print(f"\nAll test messages sent.")
+        print(f"Check DynamoDB table 'aqm_readings' to verify.")
+
+    except ConnectionError as e:
+        print(f"Connection failed: {e}")
+
+    except KeyboardInterrupt:
+        pass
+
+    finally:
+        publisher.disconnect()
