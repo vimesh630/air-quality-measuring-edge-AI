@@ -103,3 +103,19 @@ class MQTTPublisher:
         self.client.loop_stop()
         self.client.disconnect()
         print("Disconnected from AWS IoT Core.")
+
+    # ── Private callbacks ──────────────────
+
+    def _on_connect(self, client, userdata, flags, rc):
+        if rc == 0:
+            self.connected = True
+            print(f"MQTT connected (rc={rc})")
+        else:
+            error_codes = {
+                1: "Incorrect protocol version",
+                2: "Invalid client ID",
+                3: "Server unavailable",
+                4: "Bad username or password",
+                5: "Not authorised"
+            }
+            print(f"MQTT connect failed: {error_codes.get(rc, f'rc={rc}')}")
