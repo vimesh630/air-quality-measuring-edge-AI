@@ -40,3 +40,29 @@ class MQTTPublisher:
         self.client.on_connect    = self._on_connect
         self.client.on_disconnect = self._on_disconnect
         self.client.on_message    = self._on_message
+
+    def connect(self):
+        """Connect to AWS IoT Core."""
+        print(f"Connecting to AWS IoT Core...")
+        print(f"  Endpoint : {ENDPOINT}")
+        print(f"  ClientID : {CLIENT_ID}")
+        print(f"  Topic    : {DATA_TOPIC}")
+
+        self.client.connect(ENDPOINT, PORT, keepalive=60)
+
+        # Start background network loop
+        self.client.loop_start()
+
+        # Wait up to 10 seconds for connection
+        timeout = 10
+        while not self.connected and timeout > 0:
+            time.sleep(0.5)
+            timeout -= 0.5
+
+        if not self.connected:
+            raise ConnectionError(
+                "Could not connect to AWS IoT Core. "
+                "Check your endpoint, certificates, and internet connection."
+            )
+
+        print("Connected to AWS IoT Core successfully.\n")
