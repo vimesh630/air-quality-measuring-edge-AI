@@ -29,3 +29,22 @@ except ModuleNotFoundError:
         _Interp = tf.lite.Interpreter
     class tflite:
         Interpreter = _Interp
+
+# ─────────────────────────────────────────
+# Configuration
+# ─────────────────────────────────────────
+MODEL_PATH   = os.path.join(os.path.dirname(__file__),
+                            '..', 'model', 'classifier', 'output', 'aqm_model.tflite')
+SCALER_PATH  = os.path.join(os.path.dirname(__file__),
+                            '..', 'model', 'classifier', 'output', 'scaler.pkl')
+ENCODER_PATH = os.path.join(os.path.dirname(__file__),
+                            '..', 'model', 'classifier', 'output', 'label_encoder.pkl')
+
+SAMPLE_INTERVAL = 2
+ALERT_LABEL     = 'poor'
+
+GREEN  = '\033[92m'
+YELLOW = '\033[93m'
+RED    = '\033[91m'
+RESET  = '\033[0m'
+BOLD   = '\033[1m'
