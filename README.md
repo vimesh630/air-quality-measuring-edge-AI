@@ -1,1 +1,0 @@
-# air-quality-measuring-edge-AI
