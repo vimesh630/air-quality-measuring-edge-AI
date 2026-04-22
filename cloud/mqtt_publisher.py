@@ -119,3 +119,8 @@ class MQTTPublisher:
                 5: "Not authorised"
             }
             print(f"MQTT connect failed: {error_codes.get(rc, f'rc={rc}')}")
+
+    def _on_disconnect(self, client, userdata, rc):
+        self.connected = False
+        if rc != 0:
+            print(f"Unexpected MQTT disconnect (rc={rc}) — will reconnect")
