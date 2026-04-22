@@ -88,3 +88,12 @@ class MQTTPublisher:
         else:
             print(f"MQTT publish failed: rc={result.rc}")
             return False
+    
+    def subscribe_commands(self, callback):
+        """
+        Subscribe to the command topic.
+        callback(command_dict) is called when a command arrives.
+        """
+        self.command_callback = callback
+        self.client.subscribe(CMD_TOPIC, qos=1)
+        print(f"Subscribed to command topic: {CMD_TOPIC}")
