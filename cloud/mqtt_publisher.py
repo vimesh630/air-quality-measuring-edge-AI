@@ -97,3 +97,9 @@ class MQTTPublisher:
         self.command_callback = callback
         self.client.subscribe(CMD_TOPIC, qos=1)
         print(f"Subscribed to command topic: {CMD_TOPIC}")
+
+    def disconnect(self):
+        """Cleanly disconnect from AWS IoT Core."""
+        self.client.loop_stop()
+        self.client.disconnect()
+        print("Disconnected from AWS IoT Core.")
