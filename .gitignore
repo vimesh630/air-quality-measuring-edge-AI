@@ -36,3 +36,5 @@ Thumbsdb
 
 dashboard/check_dbpy
 *log
+
+.env
