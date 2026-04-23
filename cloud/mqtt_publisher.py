@@ -16,8 +16,6 @@ except ImportError:
     raise ImportError("Run: pip install paho-mqtt")
 
 # ─────────────────────────────────────────
-<<<<<<< Updated upstream
-=======
 # Load .env from the project root (one level above cloud/)
 # ─────────────────────────────────────────
 _PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,7 +41,6 @@ KEY_PATH  = _resolve(KEY_PATH)
 CA_PATH   = _resolve(CA_PATH)
 
 # ─────────────────────────────────────────
->>>>>>> Stashed changes
 # MQTTPublisher class
 # ─────────────────────────────────────────
 class MQTTPublisher:
