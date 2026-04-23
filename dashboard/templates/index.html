@@ -190,6 +190,37 @@
 
   <script>
 
+    // ── Data fetching ────────────────────────────
+    async function fetchReadings() {
+      try {
+        const res  = await fetch('/api/readings?limit=30');
+        const data = await res.json();
+        if (!data.success) return;
+
+        const readings = data.readings.reverse(); // oldest first for charts
+        updateCharts(readings);
+        updateTable(readings.slice().reverse()); // newest first for table
+        updateLatest(readings[readings.length - 1]);
+        document.getElementById('refresh-info').textContent =
+          'Last updated: ' + new Date().toLocaleTimeString();
+
+      } catch(e) {
+        console.error('Fetch error:', e);
+      }
+    }
+
+    async function fetchStats() {
+      try {
+        const res  = await fetch('/api/stats');
+        const data = await res.json();
+        if (!data.success) return;
+        document.getElementById('stat-total').textContent    = data.total;
+        document.getElementById('stat-alerts').textContent   = data.alerts;
+        document.getElementById('stat-avg-aqi').textContent  = data.avg_aqi;
+        document.getElementById('stat-good').textContent     = data.label_counts.good;
+      } catch(e) {}
+    }
+
       // Alert banner
       const banner = document.getElementById('alert-banner');
       if (reading.is_alert) {
