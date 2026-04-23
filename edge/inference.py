@@ -1,10 +1,7 @@
 # edge/inference.py
 # Runs continuously on the Raspberry Pi (or laptop with simulator)
 # Reads sensors → normalises → runs TFLite inference → prints prediction
-<<<<<<< Updated upstream
-=======
 # Also subscribes to MQTT commands: read_now, set_interval, retrain
->>>>>>> Stashed changes
 #
 # Run this: python edge/inference.py
 
@@ -13,15 +10,6 @@ import os
 import time
 import json
 import pickle
-<<<<<<< Updated upstream
-import numpy as np
-from datetime import datetime
-
-# Add project root to path so we can import sensor_read.py
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..')
-))
-=======
 import threading
 import numpy as np
 from datetime import datetime
@@ -29,7 +17,6 @@ from datetime import datetime
 # Add project root to path so we can import sensor_read.py and cloud/mqtt_publisher.py
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, _ROOT)
->>>>>>> Stashed changes
 from sensor_read import read_sensors
 
 # TFLite import — works on Windows and Raspberry Pi
@@ -47,22 +34,11 @@ except ModuleNotFoundError:
 # ─────────────────────────────────────────
 # Configuration
 # ─────────────────────────────────────────
-<<<<<<< Updated upstream
-MODEL_PATH   = os.path.join(os.path.dirname(__file__),
-                            '..', 'model', 'classifier', 'output', 'aqm_model.tflite')
-SCALER_PATH  = os.path.join(os.path.dirname(__file__),
-                            '..', 'model', 'classifier', 'output', 'scaler.pkl')
-ENCODER_PATH = os.path.join(os.path.dirname(__file__),
-                            '..', 'model', 'classifier', 'output', 'label_encoder.pkl')
-
-SAMPLE_INTERVAL = 2
-=======
 MODEL_PATH   = os.path.join(_ROOT, 'model', 'classifier', 'output', 'aqm_model.tflite')
 SCALER_PATH  = os.path.join(_ROOT, 'model', 'classifier', 'output', 'scaler.pkl')
 ENCODER_PATH = os.path.join(_ROOT, 'model', 'classifier', 'output', 'label_encoder.pkl')
 
 SAMPLE_INTERVAL = 2      # seconds between readings (mutable via command)
->>>>>>> Stashed changes
 ALERT_LABEL     = 'poor'
 
 GREEN  = '\033[92m'
@@ -72,11 +48,6 @@ RESET  = '\033[0m'
 BOLD   = '\033[1m'
 
 # ─────────────────────────────────────────
-<<<<<<< Updated upstream
-# Load model and preprocessing objects
-# ─────────────────────────────────────────
-def load_model():
-=======
 # Mutable runtime state (shared across threads)
 # ─────────────────────────────────────────
 _lock            = threading.Lock()
@@ -89,7 +60,6 @@ _retrain_pending = threading.Event()  # set when a retrain command arrives
 # ─────────────────────────────────────────
 def load_model():
     """Load TFLite interpreter, scaler and label encoder from disk."""
->>>>>>> Stashed changes
     print("Loading model...")
 
     interpreter = tflite.Interpreter(
@@ -110,9 +80,6 @@ def load_model():
     print(f"Input   : {input_details[0]['shape']}")
     print(f"Output  : {output_details[0]['shape']}\n")
 
-<<<<<<< Updated upstream
-    return interpreter, input_details, output_details, scaler, le
-=======
     return interpreter, input_details, output_details, scaler, le
 
 
@@ -288,6 +255,11 @@ def main():
                 time.sleep(2)
                 continue
 
+            if reading is None:
+                # Sensor failed to read (timing issue)
+                time.sleep(2)
+                continue
+
             # ── Inference ────────────────────────────
             with _lock:
                 interp, in_d, out_d, scaler, le = model_state[:5]
@@ -345,4 +317,3 @@ def main():
 
 if __name__ == "__main__":
     main()
->>>>>>> Stashed changes

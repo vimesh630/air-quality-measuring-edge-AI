@@ -105,7 +105,9 @@ def _fetch_training_data(n_samples: int = 500):
     X_raw = np.array(rows,   dtype=np.float32)
     y_raw = np.array(labels, dtype=object)
 
-    label_names = sorted(set(y_raw))               # ['good', 'moderate', 'poor']
+    # Hardcode classes so the network always has 3 output neurons,
+    # even if the recent 500 readings happen to be missing a class.
+    label_names = ['good', 'moderate', 'poor']
     label_to_int = {l: i for i, l in enumerate(label_names)}
     y = np.array([label_to_int[l] for l in y_raw], dtype=np.int32)
 
