@@ -106,6 +106,8 @@ AQI/
 | ADS1115 | 16-bit I²C ADC — digitises MQ-135 analog output |
 
 > **Analog noise mitigation**: `sensor_read.py` takes 10 oversampled readings per cycle and averages them to eliminate mains hum (50 Hz) and signal jitter.
+> **MQ-135 Calibration**: Sensor requires 24-48 hour burn-in period on first use. 
+> Calibrated RO value = 9.55 kΩ measured in clean indoor air.
 
 ---
 
@@ -179,8 +181,18 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173** (React dev server) or **http://localhost:5000** (Flask with Jinja template).
+Open **http://localhost:3000** (React dev server) or **http://localhost:5000** (Flask with Jinja template).
 
+---
+
+### 5. Deploy to EC2 (Production)
+```bash
+# Build Docker image
+docker build -f dashboard/Dockerfile -t aqm-dashboard .
+
+# Run container
+docker run -d --name aqm-dashboard -p 80:5000 --restart always aqm-dashboard
+```
 ---
 
 ## 📡 API Reference
