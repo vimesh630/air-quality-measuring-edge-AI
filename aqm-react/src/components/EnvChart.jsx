@@ -66,11 +66,11 @@ export default function EnvChart({ readings }) {
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <div style={{ width: 20, height: 2, background: '#2979ff', borderRadius: 1 }} />
+            <div style={{ width: 20, height: 2, background: 'var(--blue-bright)', borderRadius: 1 }} />
             <span style={{ fontSize: 12, color: 'var(--text-2)', fontFamily: 'var(--mono)', fontWeight: 500 }}>Temp C</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <div style={{ width: 20, height: 2, background: '#00e676', borderRadius: 1 }} />
+            <div style={{ width: 20, height: 2, background: 'var(--green)', borderRadius: 1 }} />
             <span style={{ fontSize: 12, color: 'var(--text-2)', fontFamily: 'var(--mono)', fontWeight: 500 }}>Humidity %</span>
           </div>
         </div>
@@ -91,12 +91,12 @@ export default function EnvChart({ readings }) {
           />
           <Tooltip content={<CustomTooltip />} />
           <Line type="monotone" dataKey="temperature" name="Temp C"
-            stroke="#2979ff" strokeWidth={2} dot={false}
-            activeDot={{ r: 4, fill: '#448aff', stroke: 'var(--bg)', strokeWidth: 2 }}
+            stroke="var(--blue-bright)" strokeWidth={2} dot={false}
+            activeDot={{ r: 4, fill: 'var(--blue-bright)', stroke: 'var(--bg)', strokeWidth: 2 }}
           />
           <Line type="monotone" dataKey="humidity" name="Humidity %"
-            stroke="#00e676" strokeWidth={2} dot={false}
-            activeDot={{ r: 4, fill: '#00e676', stroke: 'var(--bg)', strokeWidth: 2 }}
+            stroke="var(--green)" strokeWidth={2} dot={false}
+            activeDot={{ r: 4, fill: 'var(--green)', stroke: 'var(--bg)', strokeWidth: 2 }}
           />
         </LineChart>
       </ResponsiveContainer>
