@@ -221,6 +221,32 @@
       } catch(e) {}
     }
 
+    // ── Update functions ─────────────────────────
+    function updateLatest(reading) {
+      if (!reading) return;
+
+      document.getElementById('temp-val').innerHTML =
+        reading.temperature.toFixed(1) + '<span class="metric-unit">°C</span>';
+      document.getElementById('hum-val').innerHTML  =
+        reading.humidity.toFixed(1) + '<span class="metric-unit">%</span>';
+      document.getElementById('aqi-val').textContent =
+        reading.aqi.toFixed(1);
+
+      const label    = reading.label;
+      const badge    = document.getElementById('label-badge');
+      const dot      = document.getElementById('badge-dot');
+      const labelTxt = document.getElementById('label-text');
+      const confTxt  = document.getElementById('confidence-text');
+      const navStat  = document.getElementById('nav-status');
+
+      badge.className    = `badge badge-${label}`;
+      dot.className      = `badge-dot dot-${label}`;
+      labelTxt.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+      confTxt.textContent  = `Confidence: ${(reading.confidence * 100).toFixed(1)}%`;
+
+      navStat.className   = `nav-status status-${label}`;
+      navStat.textContent = label.toUpperCase();
+
       // Alert banner
       const banner = document.getElementById('alert-banner');
       if (reading.is_alert) {
