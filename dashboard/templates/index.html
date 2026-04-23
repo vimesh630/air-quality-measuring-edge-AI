@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AQM Edge AI — Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
+
+    .navbar { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-title { font-size: 16px; font-weight: 600; }
+    .nav-status { font-size: 12px; padding: 4px 12px; border-radius: 12px; font-weight: 500; }
+    .status-good { background: #e8f5e9; color: #2e7d32; }
+    .status-moderate { background: #fff8e1; color: #f57f17; }
+    .status-poor { background: #ffebee; color: #c62828; }
+    .status-unknown { background: #f5f5f5; color: #757575; }
+
+    .alert-banner { background: #ffebee; border: 1px solid #ef9a9a; padding: 12px 24px; display: none; align-items: center; gap: 10px; }
+    .alert-banner.show { display: flex; }
+    .alert-dot { width: 10px; height: 10px; border-radius: 50%; background: #e53935; flex-shrink: 0; }
+    .alert-text { font-size: 13px; color: #c62828; font-weight: 500; }
+    .alert-time { font-size: 12px; color: #e57373; margin-left: auto; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+
+    .card { background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; padding: 16px; }
+    .card-title { font-size: 11px; color: #757575; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+
+    .metric-val { font-size: 28px; font-weight: 600; color: #212121; }
+    .metric-unit { font-size: 14px; color: #757575; margin-left: 2px; }
+
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 16px; font-size: 13px; font-weight: 600; }
+    .badge-good { background: #e8f5e9; color: #2e7d32; }
+    .badge-moderate { background: #fff8e1; color: #f57f17; }
+    .badge-poor { background: #ffebee; color: #c62828; }
+    .badge-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-good { background: #43a047; }
+    .dot-moderate { background: #ffa000; }
+    .dot-poor { background: #e53935; }
+
+    .chart-container { position: relative; height: 180px; }
+    .section-title { font-size: 12px; color: #757575; font-weight: 500; margin-bottom: 8px; }
+
+    .cmd-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .cmd-label { font-size: 12px; color: #555; flex: 1; }
+    .btn { font-size: 12px; padding: 6px 14px; border-radius: 6px; border: 1px solid #ddd; background: #fff; color: #333; cursor: pointer; transition: background 0.15s; }
+    .btn:hover { background: #f5f5f5; }
+    .btn-primary { background: #1976d2; color: #fff; border-color: #1976d2; }
+    .btn-primary:hover { background: #1565c0; }
+    .btn-active { background: #e3f2fd; border-color: #1976d2; color: #1976d2; }
+
+    .hist-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .hist-table th { text-align: left; padding: 6px 8px; color: #757575; font-weight: 500; border-bottom: 1px solid #eee; }
+    .hist-table td { padding: 6px 8px; border-bottom: 1px solid #f5f5f5; color: #424242; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; padding: 12px; text-align: center; }
+    .stat-num { font-size: 22px; font-weight: 600; color: #212121; }
+    .stat-label { font-size: 11px; color: #757575; margin-top: 2px; }
+
+    .refresh-info { font-size: 11px; color: #bbb; text-align: right; margin-bottom: 8px; }
+
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="nav-title">AQM Edge AI — Indoor Air Quality Monitor</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:12px;color:#999" id="device-label">Device: aqm-pi-device</span>
+      <span class="nav-status status-unknown" id="nav-status">Loading...</span>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="refresh-info" id="refresh-info">Last updated: —</div>
+
+    <!-- Summary stats -->
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total readings</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-alerts" style="color:#e53935">—</div><div class="stat-label">Total alerts</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-avg-aqi">—</div><div class="stat-label">Avg AQI</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-good" style="color:#43a047">—</div><div class="stat-label">Good readings</div></div>
+    </div>
+
+    <div class="grid-2">
+
+      <!-- LEFT COLUMN -->
+      <div>
+        <!-- Live metrics -->
+        <div class="section-title">Live sensor readings</div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title">Temperature</div>
+            <div class="metric-val" id="temp-val">—<span class="metric-unit">°C</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Humidity</div>
+            <div class="metric-val" id="hum-val">—<span class="metric-unit">%</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">AQI</div>
+            <div class="metric-val" id="aqi-val">—</div>
+          </div>
+        </div>
+
+        <!-- Classification badge -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Current classification</div>
+          <span class="badge badge-unknown" id="label-badge">
+            <span class="badge-dot" id="badge-dot"></span>
+            <span id="label-text">Loading...</span>
+          </span>
+          <span style="font-size:12px;color:#999;margin-left:10px" id="confidence-text"></span>
+        </div>
+
+        <!-- AQI chart -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">AQI — last 30 readings</div>
+          <div class="chart-container">
+            <canvas id="aqi-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Temp + Humidity chart -->
+        <div class="card">
+          <div class="card-title">Temperature + humidity over time</div>
+          <div class="chart-container">
+            <canvas id="env-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+
+        <!-- Device control -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-title">Device control</div>
+          <div class="cmd-row">
+            <span class="cmd-label">Sampling interval</span>
+            <button class="btn btn-active" id="btn-2s"  onclick="setInterval_(2)">2s</button>
+            <button class="btn"            id="btn-5s"  onclick="setInterval_(5)">5s</button>
+            <button class="btn"            id="btn-10s" onclick="setInterval_(10)">10s</button>
+          </div>
+          <div class="cmd-row">
+            <span class="cmd-label">Trigger manual reading</span>
+            <button class="btn btn-primary" onclick="sendCommand('read_now')">Read now</button>
+          </div>
+          <div class="cmd-row">
+            <span class="cmd-label">Retrain on-device model</span>
+            <button class="btn" onclick="sendCommand('retrain')">Retrain</button>
+          </div>
+          <div style="font-size:11px;color:#bbb;margin-top:8px" id="cmd-status"></div>
+        </div>
+
+        <!-- Recent readings table -->
+        <div class="card">
+          <div class="card-title">Recent readings log</div>
+          <table class="hist-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Temp</th>
+                <th>Hum</th>
+                <th>AQI</th>
+                <th>Label</th>
+              </tr>
+            </thead>
+            <tbody id="readings-tbody">
+              <tr><td colspan="5" style="text-align:center;color:#bbb;padding:16px">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+      // Alert banner
+      const banner = document.getElementById('alert-banner');
+      if (reading.is_alert) {
+        banner.classList.add('show');
+        document.getElementById('alert-time').textContent =
+          reading.timestamp.split('T')[1]?.substring(0,8) || reading.timestamp;
+      } else {
+        banner.classList.remove('show');
+      }
+    }
+
+    function updateCharts(readings) {
+      const labels = readings.map(r =>
+        r.timestamp.split('T')[1]?.substring(0,5) || r.timestamp
+      );
+      aqiChart.data.labels                = labels;
+      aqiChart.data.datasets[0].data      = readings.map(r => r.aqi);
+      envChart.data.labels                = labels;
+      envChart.data.datasets[0].data      = readings.map(r => r.temperature);
+      envChart.data.datasets[1].data      = readings.map(r => r.humidity);
+      aqiChart.update();
+      envChart.update();
+    }
+
+    function updateTable(readings) {
+      const tbody = document.getElementById('readings-tbody');
+      if (!readings.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#bbb;padding:16px">No data yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = readings.slice(0, 10).map(r => {
+        const time  = r.timestamp.split('T')[1]?.substring(0,8) || r.timestamp;
+        const cls   = r.label;
+        const dot   = `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${
+          cls==='good' ? '#43a047' : cls==='moderate' ? '#ffa000' : '#e53935'
+        };margin-right:4px"></span>`;
+        return `<tr>
+          <td>${time}</td>
+          <td>${r.temperature.toFixed(1)}°C</td>
+          <td>${r.humidity.toFixed(1)}%</td>
+          <td>${r.aqi.toFixed(1)}</td>
+          <td>${dot}${r.label.charAt(0).toUpperCase()+r.label.slice(1)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ── Command functions ────────────────────────
+    async function sendCommand(action, value=null) {
+      const status = document.getElementById('cmd-status');
+      status.textContent = `Sending ${action}...`;
+      try {
+        const res  = await fetch('/api/command', {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ action, value })
+        });
+        const data = await res.json();
+        status.textContent = data.success
+          ? `Command sent: ${action}`
+          : `Error: ${data.error}`;
+        setTimeout(() => status.textContent = '', 3000);
+      } catch(e) {
+        status.textContent = 'Command failed';
+      }
+    }
+
+    function setInterval_(seconds) {
+      ['2s','5s','10s'].forEach(s => {
+        document.getElementById(`btn-${s}`).className = 'btn';
+      });
+      document.getElementById(`btn-${seconds}s`).className = 'btn btn-active';
+      sendCommand('set_interval', seconds);
+    }
+
+    // ── Auto refresh ─────────────────────────────
+    fetchReadings();
+    fetchStats();
+    setInterval(fetchReadings, 5000);   // refresh every 5 seconds
+    setInterval(fetchStats,    30000);  // refresh stats every 30 seconds
+  </script>
+
+</body>
+</html>
