@@ -1,7 +1,7 @@
 import { getGasStatus, formatPPM } from '../utils/helpers'
-import { Flame } from 'lucide-react'
+import { Flame, AlertTriangle } from 'lucide-react'
 
-const GasCard = ({ name, formula, value, unit, safe, warn, desc }) => {
+const GasCard = ({ name, formula, value, unit, safe, warn }) => {
   const numVal = value != null ? Number(value) : null
   const status = getGasStatus(numVal, safe, warn)
 
@@ -9,71 +9,79 @@ const GasCard = ({ name, formula, value, unit, safe, warn, desc }) => {
     ? Math.min(100, (numVal / (warn * 2)) * 100)
     : 0
 
-  return (
-    <div style={{
-      background: 'var(--bg-elevated)',
-      border: '1px solid var(--border)',
-      borderRadius: 12,
-      padding: '16px 18px',
-      position: 'relative',
-      overflow: 'hidden',
-      transition: 'border-color 0.2s'
-    }}
-    onMouseEnter={e => e.currentTarget.style.borderColor = status.color + '44'}
-    onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
-    >
-      {/* Background glow */}
-      <div style={{
-        position: 'absolute', top: 0, right: 0,
-        width: 60, height: 60,
-        background: status.dim,
-        borderRadius: '0 12px 0 60px',
-        pointerEvents: 'none'
-      }} />
+  // Gradient based on status
+  const gradColor = status.label === 'Safe'      ? '#00e676'
+                  : status.label === 'Elevated'  ? '#ffab40'
+                  : status.label === 'Dangerous' ? '#ff5252'
+                  : '#8888aa'
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
+  return (
+    <div
+      style={{
+        background: 'var(--bg-elevated)',
+        border: '1px solid var(--border)',
+        borderRadius: 16,
+        padding: '16px 18px',
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'border-color 0.2s, background-color 0.2s',
+        cursor: 'default'
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.borderColor = status.color + '55'
+        e.currentTarget.style.backgroundColor = 'var(--bg-glass)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.borderColor = 'var(--border)'
+        e.currentTarget.style.backgroundColor = 'var(--bg-elevated)'
+      }}
+    >
+
+      {/* Formula + status badge */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
         <div>
           <div style={{
-            fontSize: 16, fontWeight: 700,
+            fontSize: 17, fontWeight: 800,
             color: 'var(--text-1)',
             letterSpacing: '-0.01em',
-            fontFamily: 'var(--mono)'
+            fontFamily: 'var(--mono)',
+            lineHeight: 1
           }}>
             {formula}
           </div>
-          <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 1 }}>{name}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 3 }}>{name}</div>
         </div>
         <div style={{
-          fontSize: 12, fontWeight: 700,
+          fontSize: 11, fontWeight: 600,
           padding: '3px 8px',
           borderRadius: 6,
           background: status.dim,
           color: status.color,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase'
+          textTransform: 'capitalize'
         }}>
           {status.label}
         </div>
       </div>
 
       {/* Value */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 14 }}>
         <span style={{
-          fontSize: 28, fontWeight: 700,
+          fontSize: 32, fontWeight: 700,
           color: status.label === '--' ? 'var(--text-3)' : status.color,
           letterSpacing: '-0.03em',
           fontFamily: 'var(--mono)',
-          lineHeight: 1
+          lineHeight: 1,
+          transition: 'color 0.3s'
         }}>
           {formatPPM(numVal)}
         </span>
         <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{unit}</span>
       </div>
 
-      {/* Progress bar */}
+      {/* Gradient progress bar */}
       <div style={{
-        height: 3,
-        background: 'rgba(255,255,255,0.05)',
+        height: 4,
+        background: 'var(--border-mid)',
         borderRadius: 2,
         overflow: 'hidden',
         marginBottom: 8
@@ -81,14 +89,13 @@ const GasCard = ({ name, formula, value, unit, safe, warn, desc }) => {
         <div style={{
           height: '100%',
           width: `${pct}%`,
-          background: status.color,
+          background: `linear-gradient(90deg, ${gradColor}88, ${gradColor})`,
           borderRadius: 2,
-          transition: 'width 0.8s ease, background 0.3s ease',
-          opacity: 0.8
+          transition: 'width 0.95s cubic-bezier(0.25, 0.85, 0.45, 1.0)'
         }} />
       </div>
 
-      {/* Thresholds */}
+      {/* Threshold labels */}
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 9, color: 'var(--text-3)', fontFamily: 'var(--mono)' }}>
           Safe ≤{safe}
@@ -131,47 +138,44 @@ export default function GasReadings({ latest }) {
 
   return (
     <div
-      className="fade-up"
-      style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border)',
-        borderRadius: 14,
-        padding: '20px 22px',
-      }}
+      className="fade-up glass-card"
+      style={{ marginTop: 0 }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
         <div style={{
-          width: 30, height: 30,
-          background: 'rgba(41,121,255,0.1)',
-          border: '1px solid rgba(41,121,255,0.2)',
+          width: 32, height: 32,
+          background: 'rgba(10, 132, 255, 0.15)',
           borderRadius: 8,
-          display: 'flex', alignItems: 'center', justifyContent: 'center'
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <Flame size={14} color="var(--blue-bright)" />
+          <Flame size={15} color="var(--blue-bright)" />
         </div>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-            Gas Concentrations
-          </div>
+          <div className="card-section-label">Gas Concentrations</div>
           <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 1 }}>
             MQ-135 sensor estimates
           </div>
         </div>
       </div>
 
-      <div className="gas-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+      <div className="gas-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
         {gases.map(g => <GasCard key={g.formula} {...g} />)}
       </div>
 
       <div style={{
-        marginTop: 12,
-        fontSize: 12,
+        marginTop: 14,
+        fontSize: 11,
         color: 'var(--text-3)',
         fontStyle: 'italic',
-        lineHeight: 1.5
+        lineHeight: 1.6,
+        paddingTop: 12,
+        borderTop: '1px solid var(--border)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 6
       }}>
-        Values are approximate estimates based on MQ-135 sensitivity curves.
-        Calibration improves accuracy.
+        <AlertTriangle size={13} style={{ flexShrink: 0, marginTop: 1, color: 'var(--amber, #ffab40)' }} />
+        <span>Values are approximate estimates based on MQ-135 sensitivity curves. Sensor calibration improves accuracy.</span>
       </div>
     </div>
   )
