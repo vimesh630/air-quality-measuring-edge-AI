@@ -47,3 +47,5 @@
 | 📡 **Bidirectional MQTT** | Dashboard sends commands to change interval, trigger reads, or kick off retraining |
 
 ---
+
+
