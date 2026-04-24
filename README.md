@@ -196,3 +196,27 @@ docker run -d --name aqm-dashboard -p 80:5000 --restart always aqm-dashboard
 ```
 
 ---
+---
+
+## 📦 Key Dependencies
+
+| Package | Purpose |
+|---|---|
+| `tensorflow` | Model training + TFLite conversion |
+| `tflite-runtime` | Lightweight inference on Raspberry Pi |
+| `scikit-learn` | Preprocessing, Random Forest, metrics |
+| `boto3` | DynamoDB reads for on-device training + IoT Core |
+| `paho-mqtt` | MQTT communication |
+| `flask` + `flask-cors` | REST API backend |
+| `adafruit-circuitpython-dht` | DHT22 driver |
+| `adafruit-circuitpython-ads1x15` | ADS1115 ADC driver |
+
+---
+
+## 📄 License
+
+This project is for academic and research purposes.
+
+---
+
+*Built with Python · TensorFlow Lite · AWS IoT Core · React · Flask*
