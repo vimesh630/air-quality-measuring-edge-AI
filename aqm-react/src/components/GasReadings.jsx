@@ -1,5 +1,6 @@
 import { getGasStatus, formatPPM } from '../utils/helpers'
 import { Flame, AlertTriangle } from 'lucide-react'
+import { useSettingsContext } from '../context/SettingsContext'
 
 const GasCard = ({ name, formula, value, unit, safe, warn }) => {
   const numVal = value != null ? Number(value) : null
@@ -109,30 +110,32 @@ const GasCard = ({ name, formula, value, unit, safe, warn }) => {
 }
 
 export default function GasReadings({ latest }) {
+  const { settings } = useSettingsContext();
+
   const gases = [
     {
       name:    'Carbon Dioxide',
       formula: 'CO₂',
       value:   latest?.co2_ppm,
       unit:    'ppm',
-      safe:    1000,
-      warn:    2000,
+      safe:    settings.co2Warn,
+      warn:    settings.co2Alert,
     },
     {
       name:    'Carbon Monoxide',
       formula: 'CO',
       value:   latest?.co_ppm,
       unit:    'ppm',
-      safe:    9,
-      warn:    35,
+      safe:    settings.coWarn,
+      warn:    settings.coWarn * 3.5, // derive warn from safe
     },
     {
       name:    'Ammonia',
       formula: 'NH₃',
       value:   latest?.nh3_ppm,
       unit:    'ppm',
-      safe:    25,
-      warn:    50,
+      safe:    settings.nh3Warn,
+      warn:    settings.nh3Warn * 2, // derive warn from safe
     }
   ]
 

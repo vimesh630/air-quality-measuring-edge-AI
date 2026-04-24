@@ -1,4 +1,5 @@
 import { aqiCategory } from '../utils/helpers'
+import { useSettingsContext } from '../context/SettingsContext'
 
 const polar = (cx, cy, r, angleDeg) => {
   const rad = ((angleDeg - 90) * Math.PI) / 180
@@ -27,8 +28,9 @@ const EASE = 'cubic-bezier(0.25, 0.85, 0.45, 1.0)'
 const DURATION = '0.95s'
 
 export default function AQIGauge({ value, darkMode = true }) {
+  const { settings } = useSettingsContext();
   const aqi  = value != null ? Math.min(AQI_MAX, Math.max(0, Number(value))) : null
-  const cat  = aqiCategory(aqi)
+  const cat  = aqiCategory(aqi, settings)
   const pct  = aqi != null ? aqi / AQI_MAX : 0
 
   // Compute total arc length for stroke-dasharray drawing
@@ -135,18 +137,18 @@ export default function AQIGauge({ value, darkMode = true }) {
             />
           )}
 
-          {/* ── Zone tick: Good limit (AQI 12) ── */}
+          {/* ── Zone tick: Good limit ── */}
           {(() => {
-            const a  = angleAt(12)
+            const a  = angleAt(settings.aqiWarn)
             const p1 = polar(CX, CY, R_TRACK - 9, a)
             const p2 = polar(CX, CY, R_TRACK + 9, a)
             return <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
               stroke="var(--gauge-good, #3aaa6e)" strokeWidth={1.5} strokeOpacity={0.5} strokeLinecap="round" />
           })()}
 
-          {/* ── Zone tick: Moderate limit (AQI 35.4) ── */}
+          {/* ── Zone tick: Moderate limit ── */}
           {(() => {
-            const a  = angleAt(35.4)
+            const a  = angleAt(settings.aqiAlert)
             const p1 = polar(CX, CY, R_TRACK - 9, a)
             const p2 = polar(CX, CY, R_TRACK + 9, a)
             return <line x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
