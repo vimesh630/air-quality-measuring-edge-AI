@@ -47,5 +47,37 @@
 | 📡 **Bidirectional MQTT** | Dashboard sends commands to change interval, trigger reads, or kick off retraining |
 
 ---
+## 🗂️ Project Structure
+
+```
+AQI/
+├── sensor_read.py              # DHT22 + MQ-135 hardware driver
+├── edge/
+│   ├── inference.py            # Main edge loop: read → classify → publish
+│   └── on_device_train.py      # ✦ NEW — retrain classifier on Pi from DynamoDB data
+├── cloud/
+│   └── mqtt_publisher.py       # MQTT client for AWS IoT Core
+├── model/
+│   ├── classifier/
+│   │   ├── train_model.py      # Trains RF + neural net, exports TFLite
+│   │   └── output/
+│   │       ├── aqm_model.tflite
+│   │       ├── scaler.pkl
+│   │       └── label_encoder.pkl
+│   └── lstm_forecast/
+│       ├── train_lstm.py       # Stacked LSTM for AQI time-series forecasting
+│       └── output/
+│           ├── aqm_lstm.tflite
+│           ├── lstm_model.keras
+│           └── lstm_scaler.pkl
+├── dashboard/
+│   └── app.py                  # Flask REST API
+├── aqm-react/                  # Vite + React frontend
+├── .env                        # AWS credentials (not committed)
+├── requirements.txt
+└── README.md
+```
+
+---
 
 
