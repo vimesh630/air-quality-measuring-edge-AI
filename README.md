@@ -100,5 +100,17 @@ AQI/
 - Keeps the model adapted to **local environmental drift** over time
 
 ---
+## 🔧 Hardware
 
+| Component | Role |
+|---|---|
+| Raspberry Pi 4 | Edge compute, runs TFLite inference + on-device training |
+| DHT22 | Temperature + relative humidity (GPIO pin 4) |
+| MQ-135 | Gas sensor: CO₂, CO, NH₃ estimation |
+| ADS1115 | 16-bit I²C ADC — digitises MQ-135 analog output |
+
+> **Analog noise mitigation**: 10 oversampled readings per cycle, averaged to eliminate 50 Hz mains hum.
+> **MQ-135 Calibration**: 24–48 hour burn-in required. Calibrated RO = 9.55 kΩ in clean indoor air.
+
+---
 
