@@ -79,5 +79,26 @@ AQI/
 ```
 
 ---
+## 🧠 AI Models
+
+### 1. AQI Classifier — Edge (TFLite)
+- **Architecture**: Dense 64 → 32 → 3 with BatchNorm + Dropout
+- **Input**: `temperature`, `humidity`, `aqi`
+- **Output**: `good` / `moderate` / `poor` with confidence scores
+- **Size**: < 500 KB quantized, runs directly on Raspberry Pi
+
+### 2. LSTM Forecaster — Cloud
+- **Architecture**: Stacked LSTM 64 → 32 with Dropout
+- **Sequence**: 24-hour lookback → predicts 1 hour ahead
+- **Training data**: PRSA Beijing PM2.5 dataset (2013–2017)
+
+### 3. On-Device Training — `edge/on_device_train.py` ✦ New
+- Fetches historical readings from DynamoDB using `boto3`
+- Retrains the dense AQI classifier entirely on the Pi (ARM CPU)
+- Exports updated `.tflite` model and `scaler.pkl` in-place
+- Triggered via MQTT command: `{"action": "retrain"}`
+- Keeps the model adapted to **local environmental drift** over time
+
+---
 
 
