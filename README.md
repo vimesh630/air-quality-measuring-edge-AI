@@ -33,3 +33,17 @@
 ```
 
 ---
+
+## ✨ Key Features
+
+| Feature | Detail |
+|---|---|
+| ⚡ **Real-time Inference** | TFLite neural network classifies air quality every 2 s on-device |
+| 🌡️ **Multi-sensor Fusion** | DHT22 (temp + humidity) + MQ-135 (CO₂, CO, NH₃) via ADS1115 ADC |
+| ☁️ **Cloud Streaming** | Secure MQTT over TLS → AWS IoT Core → DynamoDB auto-insert |
+| 🧠 **LSTM Forecasting** | Stacked LSTM predicts AQI 1 hour ahead from a 24-hr lookback window |
+| 🔄 **On-Device Training** | Pi pulls DynamoDB history and retrains the classifier locally — no cloud GPU needed |
+| 📊 **Live Dashboard** | React + Vite frontend with real-time charts, AQI gauge, gas breakdown, and alerts |
+| 📡 **Bidirectional MQTT** | Dashboard sends commands to change interval, trigger reads, or kick off retraining |
+
+---
