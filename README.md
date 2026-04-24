@@ -20,7 +20,7 @@
 │        Raspberry Pi         │ ───────────────────► │    AWS IoT Core      │
 │                             │                      └──────────┬───────────┘
 │  DHT22  ──► Temp/Humidity   │                                 │ IoT Rule
-│  MQ-135 ──► CO₂ / CO / NH₃ │                       ┌──────────▼───────────┐
+│  MQ-135 ──► CO₂ / CO / NH₃  │                      ┌──────────▼───────────┐
 │  TFLite Classifier          │                      │    DynamoDB Table    │
 │  on_device_train.py ◄───────┼── retrain command    │   (aqm_readings)     │
 └─────────────────────────────┘                      └──────────┬───────────┘
