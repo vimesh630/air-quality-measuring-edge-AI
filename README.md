@@ -54,7 +54,7 @@ AQI/
 ├── sensor_read.py              # DHT22 + MQ-135 hardware driver
 ├── edge/
 │   ├── inference.py            # Main edge loop: read → classify → publish
-│   └── on_device_train.py      # ✦ NEW — retrain classifier on Pi from DynamoDB data
+│   └── on_device_train.py      # Retrain classifier on Pi from DynamoDB data
 ├── cloud/
 │   └── mqtt_publisher.py       # MQTT client for AWS IoT Core
 ├── model/
