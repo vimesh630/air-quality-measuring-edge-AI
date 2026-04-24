@@ -15,30 +15,20 @@ try:
 except ImportError:
     raise ImportError("Run: pip install paho-mqtt")
 
-# ─────────────────────────────────────────
-# Load .env from the project root (one level above cloud/)
-# ─────────────────────────────────────────
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load_dotenv(os.path.join(_PROJECT_ROOT, ".env"))
+load_dotenv()
 
-ENDPOINT   = os.getenv("AWS_IOT_ENDPOINT", "")
+# AWS IoT Configuration
+CLIENT_ID  = os.getenv("CLIENT_ID", "aqm-pi-device")
+ENDPOINT   = os.getenv("AWS_IOT_ENDPOINT")
 PORT       = int(os.getenv("AWS_IOT_PORT", 8883))
-CLIENT_ID  = os.getenv("CLIENT_ID",         "aqm-pi-device")
-DATA_TOPIC = os.getenv("AWS_IOT_TOPIC",     "aqm/readings")
+DATA_TOPIC = os.getenv("AWS_IOT_DATA_TOPIC", "aqm/data")
 CMD_TOPIC  = os.getenv("AWS_IOT_CMD_TOPIC", "aqm/commands")
-CERT_PATH  = os.getenv("CERT_PATH",         "certs/device.pem.crt")
-KEY_PATH   = os.getenv("KEY_PATH",          "certs/private.pem.key")
-CA_PATH    = os.getenv("CA_PATH",           "certs/AmazonRootCA1.pem")
 
-# Resolve relative cert paths against the project root
-def _resolve(path: str) -> str:
-    if os.path.isabs(path):
-        return path
-    return os.path.join(_PROJECT_ROOT, path)
+# Certificate paths
+CERT_PATH  = os.getenv("CERT_PATH", "certs/certificate.pem.crt")
+KEY_PATH   = os.getenv("KEY_PATH", "certs/private.pem.key")
+CA_PATH    = os.getenv("CA_PATH", "certs/AmazonRootCA1.pem")
 
-CERT_PATH = _resolve(CERT_PATH)
-KEY_PATH  = _resolve(KEY_PATH)
-CA_PATH   = _resolve(CA_PATH)
 
 # ─────────────────────────────────────────
 # MQTTPublisher class
