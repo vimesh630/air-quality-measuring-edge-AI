@@ -138,3 +138,43 @@ CERT_PATH=certs/device.pem.crt
 KEY_PATH=certs/private.pem.key
 CA_PATH=certs/AmazonRootCA1.pem
 ```
+### 2. Train Models
+
+```bash
+python model/classifier/train_model.py
+python model/lstm_forecast/train_lstm.py
+```
+
+### 3. Run Edge Inference (on Pi)
+
+```bash
+python edge/inference.py
+```
+
+### 4. Run On-Device Training (on Pi)
+
+```bash
+python edge/on_device_train.py
+```
+
+Or trigger remotely from the dashboard via MQTT:
+```json
+{ "action": "retrain" }
+```
+
+### 5. Start the Dashboard
+
+```bash
+python dashboard/app.py
+
+cd aqm-react && npm install && npm run dev
+```
+
+### 6. Deploy to EC2
+
+```bash
+docker build -f dashboard/Dockerfile -t aqm-dashboard .
+docker run -d --name aqm-dashboard -p 80:5000 --restart always aqm-dashboard
+```
+
+---
