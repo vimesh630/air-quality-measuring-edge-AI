@@ -113,4 +113,11 @@ AQI/
 > **MQ-135 Calibration**: 24–48 hour burn-in required. Calibrated RO = 9.55 kΩ in clean indoor air.
 
 ---
+## ☁️ Cloud Architecture
 
+- **AWS IoT Core** — MQTT broker with mutual TLS (X.509 certificates)
+- **DynamoDB** — `aqm_readings` table keyed by `device_id` + `timestamp`
+- **IoT Rule** — routes `aqm/data` topic → DynamoDB insert automatically
+- **Bidirectional MQTT** — dashboard sends to `aqm/commands`; Pi subscribes and responds
+
+---
