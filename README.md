@@ -121,3 +121,20 @@ AQI/
 - **Bidirectional MQTT** — dashboard sends to `aqm/commands`; Pi subscribes and responds
 
 ---
+
+## 🚀 Getting Started
+
+### 1. Configure Environment
+
+```env
+AWS_REGION=eu-north-1
+DYNAMODB_TABLE=aqm_readings
+CLIENT_ID=aqm-pi-device
+AWS_IOT_ENDPOINT=.iot.eu-north-1.amazonaws.com
+AWS_IOT_PORT=8883
+AWS_IOT_DATA_TOPIC=aqm/data
+AWS_IOT_CMD_TOPIC=aqm/commands
+CERT_PATH=certs/device.pem.crt
+KEY_PATH=certs/private.pem.key
+CA_PATH=certs/AmazonRootCA1.pem
+```
