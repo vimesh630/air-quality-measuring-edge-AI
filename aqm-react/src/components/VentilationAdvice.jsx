@@ -2,6 +2,7 @@ import {
   DoorOpen, AirVent, CheckCircle2, Siren, Wind, AlertTriangle,
   CloudOff, Snowflake, Flame, Droplets, Droplet
 } from 'lucide-react'
+import { useSettingsContext } from '../context/SettingsContext'
 import { getVentilationAdvice } from '../utils/helpers'
 
 // Map icon name string → Lucide component
@@ -26,7 +27,8 @@ const priorityConfig = {
 }
 
 export default function VentilationAdvice({ reading }) {
-  const advice = getVentilationAdvice(reading)
+  const { settings } = useSettingsContext()
+  const advice = getVentilationAdvice(reading, settings)
 
   return (
     <div className="fade-up glass-card">

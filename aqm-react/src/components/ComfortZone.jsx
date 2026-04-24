@@ -1,5 +1,6 @@
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, ReferenceArea } from 'recharts'
-import { Thermometer } from 'lucide-react'
+import { Wind, Thermometer, Droplets } from 'lucide-react'
+import { useSettingsContext } from '../context/SettingsContext'
 import { getComfortStatus } from '../utils/helpers'
 
 const CustomTooltip = ({ active, payload }) => {
@@ -19,9 +20,10 @@ const CustomTooltip = ({ active, payload }) => {
 }
 
 export default function ComfortZone({ latest }) {
+  const { settings } = useSettingsContext()
   const temp   = latest?.temperature != null ? Number(latest.temperature) : null
   const hum    = latest?.humidity    != null ? Number(latest.humidity)    : null
-  const status = getComfortStatus(temp, hum)
+  const status = getComfortStatus(temp, hum, settings)
 
   const currentPoint = temp != null && hum != null ? [{ temp, hum }] : []
 
@@ -93,8 +95,8 @@ export default function ComfortZone({ latest }) {
         <ScatterChart margin={{ top: 5, right: 10, bottom: 0, left: -20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(128,128,170,0.08)" />
 
-          {/* ASHRAE comfort zone shaded area */}
-          <ReferenceArea x1={20} x2={27} y1={30} y2={65}
+          {/* Custom comfort zone shaded area */}
+          <ReferenceArea x1={settings.tempMin} x2={settings.tempMax} y1={settings.humMin} y2={settings.humMax}
             fill="rgba(0,230,118,0.07)"
             stroke="rgba(0,230,118,0.25)"
             strokeDasharray="4 3"
@@ -137,7 +139,7 @@ export default function ComfortZone({ latest }) {
       </ResponsiveContainer>
 
       <div style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 8, fontStyle: 'italic' }}>
-        Green zone = ASHRAE 55 summer comfort range (recommended indoor conditions)
+        Green zone = Target comfort range defined in settings
       </div>
     </div>
   )

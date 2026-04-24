@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { useSettingsContext } from '../context/SettingsContext'
 
 export function useAQMData(refreshInterval = 5000) {
   const [readings,    setReadings]    = useState([])
@@ -10,6 +11,7 @@ export function useAQMData(refreshInterval = 5000) {
   const [loading,     setLoading]     = useState(true)
   const [lastUpdated, setLastUpdated] = useState(null)
   const prevAlertRef = useRef(false)
+  const { settings } = useSettingsContext()
 
   const fetchAll = useCallback(async () => {
     try {
@@ -20,7 +22,28 @@ export function useAQMData(refreshInterval = 5000) {
       ])
       
       if (rRes.status === 'fulfilled' && rRes.value.data.success) {
-        const data = rRes.value.data.readings
+        let data = rRes.value.data.readings
+        // Override with custom settings
+        data = data.map(r => {
+          let isAlert = false;
+          let label = r.label || 'good';
+          
+          const aqi = Number(r.aqi || 0);
+          const co2 = Number(r.co2_ppm || 0);
+          const temp = Number(r.temperature || 0);
+          
+          if (aqi >= settings.aqiAlert || co2 >= settings.co2Alert) {
+            isAlert = true;
+            label = 'poor';
+          } else if (aqi >= settings.aqiWarn || co2 >= settings.co2Warn) {
+            label = 'moderate';
+          } else if (aqi < settings.aqiWarn && co2 < settings.co2Warn) {
+            label = 'good';
+          }
+          
+          return { ...r, is_alert: r.is_alert || isAlert, label };
+        });
+        
         setReadings([...data].reverse())
         const newest = data[0]
         setLatest(newest)
@@ -55,7 +78,7 @@ export function useAQMData(refreshInterval = 5000) {
     fetchAll()
     const id = setInterval(fetchAll, refreshInterval)
     return () => clearInterval(id)
-  }, [fetchAll, refreshInterval])
+  }, [fetchAll, refreshInterval, settings.aqiWarn, settings.aqiAlert, settings.co2Warn, settings.co2Alert])
 
   return { readings, latest, stats, forecast, loading, lastUpdated, refetch: fetchAll }
 }

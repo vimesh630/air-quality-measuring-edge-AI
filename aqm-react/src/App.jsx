@@ -18,7 +18,8 @@ import VentilationAdvice       from './components/VentilationAdvice'
 import QualityDonut            from './components/QualityDonut'
 import ComfortZone             from './components/ComfortZone'
 import AQIForecast             from './components/AQIForecast'
-import SettingsDrawer, { useSettings } from './components/SettingsDrawer'
+import SettingsDrawer from './components/SettingsDrawer'
+import { useSettingsContext } from './context/SettingsContext'
 
 import { formatTemp, formatHum, formatAQI, getLabelColor } from './utils/helpers'
 
@@ -98,7 +99,7 @@ export default function App() {
   const [darkMode,    setDarkMode]    = useState(true)
   const [tab,         setTab]         = useState('overview')   // 'overview' | 'analytics'
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const { settings, save: saveSettings } = useSettings()
+  const { settings, saveSettings } = useSettingsContext()
 
   const refreshMs = (settings.refreshInterval || 5) * 1000
   const { readings, latest, stats, forecast, loading, lastUpdated } = useAQMData(refreshMs)

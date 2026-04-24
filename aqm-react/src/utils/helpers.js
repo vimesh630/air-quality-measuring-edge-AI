@@ -42,8 +42,16 @@ export const formatPPM  = (v) => v != null ? Number(v).toFixed(1)       : '--'
 // ── Health Impact Score ─────────────────────────────────────
 // Computes a 0–100 score  (100 = perfect, 0 = dangerous)
 // based on AQI, temperature, humidity, CO₂, CO, NH₃
-export const computeHealthScore = (reading) => {
+export const computeHealthScore = (reading, settings = {}) => {
   if (!reading) return null
+
+  const s = {
+    aqiWarn: 35, aqiAlert: 50,
+    co2Warn: 1000, co2Alert: 2000,
+    coWarn: 9, nh3Warn: 25,
+    tempMin: 18, tempMax: 28,
+    ...settings
+  }
 
   const aqi  = Number(reading.aqi  ?? 0)
   const temp = Number(reading.temperature ?? 22)
@@ -52,10 +60,10 @@ export const computeHealthScore = (reading) => {
   const co   = Number(reading.co_ppm      ?? 0)
   const nh3  = Number(reading.nh3_ppm     ?? 0)
 
-  // AQI sub-score (AQI 0–12 = 100, 35.4 = 60, 100+ = 0)
-  const aqiScore = aqi <= 12  ? 100
-                 : aqi <= 35.4 ? Math.round(100 - ((aqi - 12) / 23.4) * 40)
-                 : Math.max(0, Math.round(60 - ((aqi - 35.4) / 64.6) * 60))
+  // AQI sub-score 
+  const aqiScore = aqi <= s.aqiWarn/2  ? 100
+                 : aqi <= s.aqiWarn ? Math.round(100 - ((aqi - s.aqiWarn/2) / (s.aqiWarn/2)) * 40)
+                 : Math.max(0, Math.round(60 - ((aqi - s.aqiWarn) / (s.aqiAlert - s.aqiWarn || 1)) * 60))
 
   // Temp comfort: 20–26°C ideal
   const tempDiff = Math.abs(temp - 23)
@@ -65,19 +73,19 @@ export const computeHealthScore = (reading) => {
   const humDiff = Math.max(0, Math.abs(hum - 50) - 10)
   const humScore = Math.max(0, 100 - humDiff * 5)
 
-  // CO₂: 400–1000 good, 2000+ dangerous
-  const co2Score = co2 <= 1000 ? 100
-                 : co2 <= 2000 ? Math.round(100 - ((co2 - 1000) / 1000) * 60)
-                 : Math.max(0, 40 - ((co2 - 2000) / 1000) * 40)
+  // CO₂
+  const co2Score = co2 <= s.co2Warn ? 100
+                 : co2 <= s.co2Alert ? Math.round(100 - ((co2 - s.co2Warn) / (s.co2Alert - s.co2Warn || 1)) * 60)
+                 : Math.max(0, 40 - ((co2 - s.co2Alert) / 1000) * 40)
 
-  // CO: 0–9 safe
-  const coScore = co <= 9  ? 100
-                : co <= 35 ? Math.round(100 - ((co - 9) / 26) * 70)
+  // CO
+  const coScore = co <= s.coWarn  ? 100
+                : co <= s.coWarn * 3.5 ? Math.round(100 - ((co - s.coWarn) / (s.coWarn * 2.5)) * 70)
                 : 0
 
-  // NH₃: 0–25 safe
-  const nh3Score = nh3 <= 25 ? 100
-                 : nh3 <= 50  ? Math.round(100 - ((nh3 - 25) / 25) * 60)
+  // NH₃
+  const nh3Score = nh3 <= s.nh3Warn ? 100
+                 : nh3 <= s.nh3Warn * 2  ? Math.round(100 - ((nh3 - s.nh3Warn) / s.nh3Warn) * 60)
                  : 0
 
   // Weighted average
@@ -102,8 +110,17 @@ export const getHealthLabel = (score) => {
 }
 
 // ── Ventilation Advice ──────────────────────────────────────
-export const getVentilationAdvice = (reading) => {
+export const getVentilationAdvice = (reading, settings = {}) => {
   if (!reading) return []
+
+  const s = {
+    aqiWarn: 35, aqiAlert: 50,
+    co2Warn: 1000, co2Alert: 2000,
+    coWarn: 9, nh3Warn: 25,
+    tempMin: 18, tempMax: 28,
+    humMin: 30, humMax: 65,
+    ...settings
+  }
 
   const advice = []
   const aqi  = Number(reading.aqi  ?? 0)
@@ -114,45 +131,45 @@ export const getVentilationAdvice = (reading) => {
   const nh3  = Number(reading.nh3_ppm     ?? 0)
 
   // AQI recommendations
-  if (aqi > 35.4) {
+  if (aqi > s.aqiAlert) {
     advice.push({ icon: 'DoorOpen',      text: 'Open windows immediately — AQI elevated', priority: 'high',   color: '#c05555' })
     advice.push({ icon: 'AirVent',       text: 'Run air purifier on high speed',          priority: 'high',   color: '#c05555' })
-  } else if (aqi > 12) {
+  } else if (aqi > s.aqiWarn) {
     advice.push({ icon: 'DoorOpen',      text: 'Consider ventilating — moderate AQI',    priority: 'medium', color: '#c8893a' })
   } else {
     advice.push({ icon: 'CheckCircle2',  text: 'Air quality is good — no action needed', priority: 'low',    color: '#3aaa6e' })
   }
 
   // CO₂
-  if (co2 > 2000) {
+  if (co2 > s.co2Alert) {
     advice.push({ icon: 'Siren',         text: 'Critical CO₂ level — ventilate now!',              priority: 'high',   color: '#c05555' })
-  } else if (co2 > 1000) {
+  } else if (co2 > s.co2Warn) {
     advice.push({ icon: 'Wind',          text: 'CO₂ elevated — increase air circulation',           priority: 'medium', color: '#c8893a' })
   }
 
   // CO
-  if (co > 35) {
+  if (co > s.coWarn * 3.5) {
     advice.push({ icon: 'Siren',         text: 'Dangerous CO levels — evacuate and ventilate!',    priority: 'high',   color: '#c05555' })
-  } else if (co > 9) {
+  } else if (co > s.coWarn) {
     advice.push({ icon: 'AlertTriangle', text: 'CO slightly elevated — check ventilation',          priority: 'medium', color: '#c8893a' })
   }
 
   // NH₃
-  if (nh3 > 50) {
+  if (nh3 > s.nh3Warn * 2) {
     advice.push({ icon: 'CloudOff',      text: 'High ammonia — ventilate and check sources',        priority: 'medium', color: '#c8893a' })
   }
 
   // Temperature
-  if (temp > 28) {
+  if (temp > s.tempMax) {
     advice.push({ icon: 'Snowflake',     text: 'Room is warm — consider AC or fan',                 priority: 'low',    color: '#3a9cb5' })
-  } else if (temp < 18) {
+  } else if (temp < s.tempMin) {
     advice.push({ icon: 'Flame',         text: 'Room is cool — check heating',                      priority: 'low',    color: '#3a9cb5' })
   }
 
   // Humidity
-  if (hum > 65) {
+  if (hum > s.humMax) {
     advice.push({ icon: 'Droplets',      text: 'High humidity — run dehumidifier',                  priority: 'medium', color: '#c8893a' })
-  } else if (hum < 30) {
+  } else if (hum < s.humMin) {
     advice.push({ icon: 'Droplet',       text: 'Low humidity — use a humidifier',                   priority: 'low',    color: '#3a9cb5' })
   }
 
@@ -164,23 +181,23 @@ export const getVentilationAdvice = (reading) => {
 }
 
 // ── ASHRAE Comfort Zone ─────────────────────────────────────
-export const getComfortStatus = (temp, hum) => {
+export const getComfortStatus = (temp, hum, settings = {}) => {
   if (temp == null || hum == null) return { inZone: null, label: 'Unknown' }
+  const s = { tempMin: 20, tempMax: 27, humMin: 30, humMax: 65, ...settings }
   const t = Number(temp), h = Number(hum)
-  // ASHRAE 55 summer comfort zone: 22–27°C, 30–70% RH
-  const inTemp = t >= 20 && t <= 27
-  const inHum  = h >= 30 && h <= 65
+  const inTemp = t >= s.tempMin && t <= s.tempMax
+  const inHum  = h >= s.humMin && h <= s.humMax
   if (inTemp && inHum) return { inZone: true,  label: 'Comfortable' }
   if (inTemp || inHum) return { inZone: false, label: 'Slightly Outside' }
   return                      { inZone: false, label: 'Uncomfortable' }
 }
 
 // ── AQI label from value ────────────────────────────────────
-export const aqiCategory = (v) => {
+export const aqiCategory = (v, settings = {}) => {
   if (v == null) return { label: '—', color: '#7878a0' }
+  const s = { aqiWarn: 35.4, aqiAlert: 55.4, ...settings }
   const n = Number(v)
-  if (n <= 12)   return { label: 'Good',      color: '#3aaa6e' }
-  if (n <= 35.4) return { label: 'Moderate',  color: '#c8893a' }
-  if (n <= 55.4) return { label: 'Unhealthy for Sensitive', color: '#b86040' }
+  if (n <= s.aqiWarn)   return { label: 'Good',      color: '#3aaa6e' }
+  if (n <= s.aqiAlert) return { label: 'Moderate',  color: '#c8893a' }
   return                 { label: 'Poor',      color: '#c05555' }
 }

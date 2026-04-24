@@ -2,6 +2,7 @@ import {
   Heart, CheckCircle2, ThumbsUp, Minus, AlertTriangle, AlertOctagon, HelpCircle
 } from 'lucide-react'
 import { computeHealthScore, getHealthLabel } from '../utils/helpers'
+import { useSettingsContext } from '../context/SettingsContext'
 
 // Map icon name string → Lucide component
 const ICON_MAP = {
@@ -14,7 +15,8 @@ const ICON_MAP = {
 }
 
 export default function HealthScore({ reading }) {
-  const score  = computeHealthScore(reading)
+  const { settings } = useSettingsContext()
+  const score  = computeHealthScore(reading, settings)
   const info   = getHealthLabel(score)
 
   // Arc math for score ring (240° span)
