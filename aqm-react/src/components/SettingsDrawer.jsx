@@ -1,19 +1,7 @@
 import { useState } from 'react'
 import { X, Settings, Save, RotateCcw } from 'lucide-react'
 
-const DEFAULT_SETTINGS = {
-  aqiWarn:   35,
-  aqiAlert:  50,
-  co2Warn:   1000,
-  co2Alert:  2000,
-  coWarn:    9,
-  nh3Warn:   25,
-  tempMin:   18,
-  tempMax:   28,
-  humMin:    30,
-  humMax:    65,
-  refreshInterval: 5,
-}
+import { DEFAULT_SETTINGS } from '../context/SettingsContext'
 
 const SliderField = ({ label, value, min, max, step = 1, unit, color = '#2979ff', onChange }) => (
   <div style={{ marginBottom: 20 }}>
@@ -41,19 +29,7 @@ const SectionHeader = ({ title, subtitle }) => (
   </div>
 )
 
-export function useSettings() {
-  const stored = (() => {
-    try { return JSON.parse(localStorage.getItem('aqm-settings')) || {} } catch { return {} }
-  })()
-  const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS, ...stored })
 
-  const save = (next) => {
-    setSettings(next)
-    localStorage.setItem('aqm-settings', JSON.stringify(next))
-  }
-
-  return { settings, save }
-}
 
 export default function SettingsDrawer({ open, onClose, settings, onSave }) {
   const [local, setLocal] = useState(settings)
