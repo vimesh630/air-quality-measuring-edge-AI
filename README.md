@@ -178,3 +178,21 @@ docker run -d --name aqm-dashboard -p 80:5000 --restart always aqm-dashboard
 ```
 
 ---
+## 📡 API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/latest` | Most recent sensor reading |
+| `GET` | `/api/readings?limit=30` | Last N readings from DynamoDB |
+| `GET` | `/api/stats` | Avg AQI, label counts, alert count |
+| `GET` | `/api/forecast` | 1-hour LSTM AQI prediction |
+| `POST` | `/api/command` | Send command to Pi via MQTT |
+
+**MQTT command examples:**
+```json
+{ "action": "read_now" }
+{ "action": "set_interval", "value": 5 }
+{ "action": "retrain" }
+```
+
+---
