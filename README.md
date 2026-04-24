@@ -13,3 +13,23 @@
 > historical data pulled directly from DynamoDB.
 
 ---
+## 📸 System Overview
+
+```
+┌─────────────────────────────┐      MQTT / TLS      ┌──────────────────────┐
+│        Raspberry Pi         │ ───────────────────► │    AWS IoT Core      │
+│                             │                      └──────────┬───────────┘
+│  DHT22  ──► Temp/Humidity   │                                 │ IoT Rule
+│  MQ-135 ──► CO₂ / CO / NH₃ │                       ┌──────────▼───────────┐
+│  TFLite Classifier          │                      │    DynamoDB Table    │
+│  on_device_train.py ◄───────┼── retrain command    │   (aqm_readings)     │
+└─────────────────────────────┘                      └──────────┬───────────┘
+                                                                │
+                                                     ┌──────────▼───────────┐
+                                                     │  Flask API + React   │
+                                                     │  Live Dashboard      │
+                                                     │  LSTM 1-hr Forecast  │
+                                                     └──────────────────────┘
+```
+
+---
